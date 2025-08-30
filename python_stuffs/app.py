@@ -75,7 +75,7 @@ else:
 
 # Running totals dictionary
 totals = {
-    "transport": 0.0,
+    "Transport": 0.0,
     "Healthcare": 0.0,
     "Food & Groceries": 0.0,
     "Housing & Utilities": 0.0,
@@ -102,7 +102,7 @@ def predict_category_and_amount(text):
             try:
                 amount += float(ent.text)
             except:
-                pass
+                pass    
 
     if category in totals:
         totals[category] += amount
@@ -121,15 +121,12 @@ def predict_expense():
 
     category, amount, updated_totals = predict_category_and_amount(text)
 
-    return jsonify({
-        "text": text,
-        "category": category,
-        "amount": amount,
-        "totals": updated_totals
-    })
+    return jsonify(
+        updated_totals
+    )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+   app.run(host="0.0.0.0", port=5000)
 
 
 
