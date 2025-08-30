@@ -1,94 +1,361 @@
 text,category
-Bought pizza,food
-Groceries shopping,food
-Lunch at restaurant,food
-Dinner with family,food
-Bought vegetables,food
-Bought fruits,food
-Ordered online food,food
-Coffee from cafe,food
-Snacks from shop,food
-Ice cream purchase,food
-Supermarket groceries,food
-Vegetable purchase,food
-Online grocery order,food
-Fruit basket,food
-Doctor consultation,medical
-Medicine purchase,medical
-Bought vitamins,medical
-Annual health checkup,medical
-Dental appointment,medical
-Eye checkup,medical
-Vaccination fee,medical
-Hospital visit,medical
-Pharmacy bill,medical
-Blood test,medical
-Bus ticket,transport
-Fuel for car,transport
-Taxi ride,transport
-Train ticket,transport
-Flight booking,transport
-Uber fare,transport
-Metro pass,transport
-Gas refill,transport
-Parking fee,transport
-Bike repair,transport
-Taxi to office,transport
-Metro recharge,transport
-Movie ticket,others
-Gym membership,others
-Book purchase,others
-Concert ticket,others
-Music subscription,others
-Gift for friend,others
-Clothes shopping,others
-Online course,others
-Software purchase,others
-Game purchase,others
-Yoga class fee,others
-Dinner at cafe,food
-Bought salad,food
-Car service,transport
-Bought cough syrup,medical
-Eye drops purchase,medical
-Lunch delivery,food
-Movie streaming subscription,others
+"Bought apples for 80 rs",Food & Groceries
+"Bananas 6 pcs for 40 rs",Food & Groceries
+"Milk 1 litre 50 rs",Food & Groceries
+"Eggs dozen 70 rs",Food & Groceries
+"Tomatoes 2kg 100 rs",Food & Groceries
+"Potatoes 3kg 90 rs",Food & Groceries
+"Onions 1kg 60 rs",Food & Groceries
+"Carrots 500g 40 rs",Food & Groceries
+"Spinach bunch 30 rs",Food & Groceries
+"Cauliflower 1 piece 50 rs",Food & Groceries
+"Rice 5kg bag 600 rs",Food & Groceries
+"Wheat flour 5kg 350 rs",Food & Groceries
+"Cooking oil 1 litre 160 rs",Food & Groceries
+"Salt packet 25 rs",Food & Groceries
+"Sugar 1kg 50 rs",Food & Groceries
+"Dal 1kg 120 rs",Food & Groceries
+"Chana 1kg 140 rs",Food & Groceries
+"Green peas 500g 80 rs",Food & Groceries
+"Cucumber 1kg 50 rs",Food & Groceries
+"Lemon 6 pcs 40 rs",Food & Groceries
+"Mangoes 1kg 150 rs",Food & Groceries
+"Oranges 1 dozen 200 rs",Food & Groceries
+"Grapes 500g 90 rs",Food & Groceries
+"Watermelon 1 piece 120 rs",Food & Groceries
+"Pineapple 1 piece 100 rs",Food & Groceries
+"Bread loaf 40 rs",Food & Groceries
+"Butter 500g 250 rs",Food & Groceries
+"Cheese 200g 120 rs",Food & Groceries
+"Paneer 250g 90 rs",Food & Groceries
+"Curd 500g 60 rs",Food & Groceries
+"Ice cream tub 200 rs",Food & Groceries
+"Biscuits pack 30 rs",Food & Groceries
+"Chips packet 20 rs",Food & Groceries
+"Soft drink bottle 60 rs",Food & Groceries
+"Juice tetra pack 100 rs",Food & Groceries
+"Tea 250g 150 rs",Food & Groceries
+"Coffee 100g 200 rs",Food & Groceries
+"Dry fruits 500g 400 rs",Food & Groceries
+"Almonds 250g 300 rs",Food & Groceries
+"Cashews 250g 320 rs",Food & Groceries
+"Raisins 200g 150 rs",Food & Groceries
+"Honey 250g 180 rs",Food & Groceries
+"Jam bottle 100 rs",Food & Groceries
+"Ketchup bottle 120 rs",Food & Groceries
+"Pickle jar 150 rs",Food & Groceries
+"Instant noodles pack 50 rs",Food & Groceries
+"Pasta 500g 80 rs",Food & Groceries
+"Breakfast cereal 250 rs",Food & Groceries
+"Chocolate bar 60 rs",Food & Groceries
+"Popcorn packet 70 rs",Food & Groceries
 
-Bought apples,food
-Bought bananas,food
-Bought oranges,food
-Purchased mangoes,food
-Bought strawberries,food
-Bought grapes,food
-Fruit basket,food
-Ordered mixed fruits online,food
-Bought watermelon,food
-Bought pineapple,food
-Bought tomatoes,food
-Bought onions,food
-Bought spinach,food
-Bought carrots,food
-Grocery shopping at supermarket,food
-Bought potatoes,food
-Bought cucumber,food
-Bought capsicum,food
-Purchased green beans,food
-Grocery order online,food
-Bought apples and carrots,food
-Supermarket shopping for vegetables and fruits,food
-Hospital visit,medical
-Doctor appointment,medical
-Surgery fee,medical
-Hospital,medical
-transport,transport
-Taxi fare,transport
-Train ticket,transport
-Bus ticket,transport
-Fuel for car,transport
-Metro pass,transport
-Parking fee,transport
-Hospital visit,medical
-Visited hospital,medical
-Hospital bill,medical
-Doctor appointment,medical
-Medical checkup,medical 
+"Paid 30 rs for bus ticket",transport
+"Auto fare was 120 rs",transport
+"Filled petrol for 500 rs",transport
+"Cab ride cost 250 rs",transport
+"Bought metro card recharge 200 rs",transport
+"Taxi bill was 340 rs",transport
+"Train ticket 90 rs",transport
+"Bus pass renewal 600 rs",transport
+"Ola ride for 180 rs",transport
+"Uber cost me 220 rs",transport
+"Rickshaw charged 70 rs",transport
+"Spent 450 rs on fuel",transport
+"Parking fee 50 rs",transport
+"Toll gate charge 120 rs",transport
+"Bike repair 300 rs",transport
+"Flight ticket 3500 rs",transport
+"Cab from airport 600 rs",transport
+"Train sleeper class 450 rs",transport
+"Bus sleeper coach 700 rs",transport
+"Paid 150 rs for e-rickshaw",transport
+"Metro ticket 60 rs",transport
+"Bike petrol 200 rs",transport
+"Paid 25 rs for shared auto",transport
+"Uber XL cost 450 rs",transport
+"Train express ticket 1200 rs",transport
+"Monthly bus pass 1200 rs",transport
+"Paid 100 rs for cycle rent",transport
+"Cab ride night fare 350 rs",transport
+"Ola auto charged 95 rs",transport
+"Bike servicing 800 rs",transport
+"Car fuel 2000 rs",transport
+"Shared cab fare 120 rs",transport
+"Bus ticket 40 rs",transport
+"Paid 500 rs for luggage transport",transport
+"Auto ride 60 rs",transport
+"Taxi ride 280 rs",transport
+"Parking 100 rs",transport
+"Paid 50 rs toll",transport
+"Metro recharge 300 rs",transport
+"Train general ticket 40 rs",transport
+"Flight baggage fee 800 rs",transport
+"Airport bus 350 rs",transport
+"Paid 900 rs for car repair",transport
+"Cab pool 150 rs",transport
+"Spent 220 rs on petrol",transport
+"Bike parking 40 rs",transport
+"Uber ride 190 rs",transport
+"Long distance bus 1200 rs",transport
+"Paid 75 rs for van share",transport
+"Autorickshaw 85 rs",transport
+"Car wash 250 rs",transport
+
+Paid ₹12000 rent for apartment,Housing & Utilities
+Electricity bill of ₹1500 for this month,Housing & Utilities
+Water bill came to ₹800 this month,Housing & Utilities
+Gas bill payment of ₹600 done,Housing & Utilities
+Paid ₹2000 for internet connection,Housing & Utilities
+Monthly rent ₹9000 transferred to landlord,Housing & Utilities
+Electricity recharge ₹1100 for home,Housing & Utilities
+Water tank refill ₹500,Housing & Utilities
+Gas cylinder refill cost ₹950,Housing & Utilities
+Paid ₹1700 for broadband service,Housing & Utilities
+Rent payment ₹15000 for flat,Housing & Utilities
+Electric bill ₹1300 cleared today,Housing & Utilities
+Water charges ₹700 paid,Housing & Utilities
+Gas connection recharge ₹850,Housing & Utilities
+Paid ₹2500 for WiFi service,Housing & Utilities
+Monthly rent transfer ₹11000 to owner,Housing & Utilities
+Electricity bill ₹1800 this month,Housing & Utilities
+Water supply charges ₹600,Housing & Utilities
+Gas bill ₹720 submitted online,Housing & Utilities
+Paid ₹2200 for internet services,Housing & Utilities
+Rent for flat ₹8000 paid on time,Housing & Utilities
+Electricity bill payment ₹1450 done,Housing & Utilities
+Water bill ₹500 settled,Housing & Utilities
+Cooking gas refill ₹780 this week,Housing & Utilities
+Paid ₹1900 for home WiFi,Housing & Utilities
+Rent of ₹10000 transferred,Housing & Utilities
+Electric charges ₹1600 deducted,Housing & Utilities
+Monthly water bill ₹650 paid,Housing & Utilities
+Gas recharge ₹700 completed,Housing & Utilities
+WiFi recharge ₹2100 for month,Housing & Utilities
+Apartment rent ₹9500 paid,Housing & Utilities
+Electricity payment ₹1200 done,Housing & Utilities
+Water tax ₹400 paid to board,Housing & Utilities
+Gas cylinder ₹880 purchased,Housing & Utilities
+Internet bill ₹2000 cleared,Housing & Utilities
+Monthly rent ₹12500 given to owner,Housing & Utilities
+Electric charges ₹1700 paid online,Housing & Utilities
+Water supply ₹550 monthly,Housing & Utilities
+Cooking gas ₹760 delivered,Housing & Utilities
+Paid ₹2300 for internet plan,Housing & Utilities
+Flat rent ₹13500 submitted,Housing & Utilities
+Light bill ₹1500 settled,Housing & Utilities
+Water charges ₹480 cleared,Housing & Utilities
+Gas refill ₹900 done today,Housing & Utilities
+WiFi payment ₹1800 made,Housing & Utilities
+House rent ₹14000 transferred,Housing & Utilities
+Electric bill ₹1550 auto-debited,Housing & Utilities
+Water bill ₹620 this month,Housing & Utilities
+Gas usage bill ₹820 paid,Housing & Utilities
+Internet charges ₹2100 cleared,Housing & Utilities
+
+Bought paracetamol for 60 rs,Healthcare  
+Doctor consultation fee 500 rs,Healthcare  
+Paid 1200 rs for blood test,Healthcare  
+Purchased cough syrup for 80 rs,Healthcare  
+Bought antibiotics for 350 rs,Healthcare  
+Hospital bill of 4500 rs,Healthcare  
+Spent 600 rs on dental cleaning,Healthcare  
+Eye checkup cost 400 rs,Healthcare  
+Bought vitamin tablets for 200 rs,Healthcare  
+X-ray charges 700 rs,Healthcare  
+Physiotherapy session cost 900 rs,Healthcare  
+Spent 250 rs on bandages,Healthcare  
+Bought inhaler for 300 rs,Healthcare  
+MRI scan bill 5500 rs,Healthcare  
+General health checkup 1500 rs,Healthcare  
+Paid 120 rs for sanitizers,Healthcare  
+Ambulance charges 2000 rs,Healthcare  
+Purchased insulin for 400 rs,Healthcare  
+Ultrasound scan cost 2500 rs,Healthcare  
+Paid 350 rs for ENT consultation,Healthcare  
+Bought ointment for 90 rs,Healthcare  
+Dental filling cost 800 rs,Healthcare  
+Purchased contact lenses solution 150 rs,Healthcare  
+Eye drops for 120 rs,Healthcare  
+Spent 3000 rs on surgery consultation,Healthcare  
+Hospital admission advance 7000 rs,Healthcare  
+Bought protein supplements 900 rs,Healthcare  
+Spent 200 rs on first aid kit,Healthcare  
+Diabetes test cost 450 rs,Healthcare  
+Bought BP monitor for 1200 rs,Healthcare  
+Orthopedic consultation fee 600 rs,Healthcare  
+Bought allergy tablets for 180 rs,Healthcare  
+Vaccination charges 800 rs,Healthcare  
+Paid 1500 rs for dietitian,Healthcare  
+Bought glucose strips for 350 rs,Healthcare  
+ECG test cost 900 rs,Healthcare  
+Spent 400 rs on dental medicines,Healthcare  
+Cancer screening test 3000 rs,Healthcare  
+Bought nasal spray for 140 rs,Healthcare  
+Purchased multivitamins for 220 rs,Healthcare  
+CT scan charges 4500 rs,Healthcare  
+Hospital pharmacy bill 650 rs,Healthcare  
+Bought herbal medicine for 300 rs,Healthcare  
+Paid 200 rs for thermometer,Healthcare  
+Regular health insurance premium 1200 rs,Healthcare  
+Emergency ward visit cost 2500 rs,Healthcare  
+Bought skin cream for 180 rs,Healthcare  
+Spent 500 rs on vaccination for flu,Healthcare  
+Paid 700 rs for pathology test,Healthcare  
+Bought antiseptic liquid for 110 rs,Healthcare  
+
+Paid tuition fee of 25000,Education  
+Bought school textbooks for 1200,Education  
+Paid college semester fee 40000,Education  
+Purchased online course for 3500,Education  
+Bought exam registration for 2000,Education  
+Paid coaching institute fee of 15000,Education  
+Bought reference books for 800,Education  
+Subscribed to online learning app for 1200,Education  
+Paid school admission fee 18000,Education  
+Purchased engineering drawing kit for 900,Education  
+Bought art supplies for 500,Education  
+Paid language class fee 3000,Education  
+Bought science lab manual 450,Education  
+Paid MBA course fee 60000,Education  
+Registered for certification exam 7000,Education  
+Purchased programming course for 2000,Education  
+Paid hostel study material fee 1200,Education  
+Bought calculator for exams 1500,Education  
+Paid for doubt clearing session 1000,Education  
+Purchased e-book subscription 500,Education  
+Paid music class fee 2500,Education  
+Bought school uniform books for 1500,Education  
+Paid professional workshop fee 3500,Education  
+Bought pen drives for projects 600,Education  
+Paid sports coaching academy fee 4000,Education  
+Registered for GRE exam 15000,Education  
+Paid IIT entrance exam fee 3000,Education  
+Bought tuition materials 750,Education  
+Subscribed to Coursera course 4000,Education  
+Paid research journal subscription 2000,Education  
+Paid library annual fee 1000,Education  
+Bought whiteboard markers 200,Education  
+Paid exam application form fee 1200,Education  
+Registered for hackathon 500,Education  
+Bought project supplies for 900,Education  
+Paid school bus fee 2500,Education  
+Bought stationery pack for 600,Education  
+Paid digital learning course 3000,Education  
+Paid school computer lab fee 1500,Education  
+Bought graph notebooks 400,Education  
+Registered for online coding test 800,Education  
+Paid skill development course 5000,Education  
+Bought lab coat for 700,Education  
+Paid career counseling workshop fee 1200,Education  
+Bought geometry box for 150,Education  
+Paid for mock test series 2000,Education  
+Bought science kit for 900,Education  
+Paid cultural activity training 1800,Education  
+Paid diploma fee 20000,Education  
+Bought printer ink for assignments 600,Education  
+
+
+Bought a new phone for 25000,others
+Purchased headphones for 1500,others
+Bought a smartwatch for 5000,others
+Movie tickets for 600,others
+Online gaming subscription for 800,others
+Bought a backpack for 1200,others
+New shoes for 3500,others
+Concert tickets for 2000,others
+Bought a gold ring for 15000,others
+Gym membership renewal 3000,others
+Bought a cricket bat for 2500,others
+Streaming platform subscription 499,others
+Purchased a perfume for 2200,others
+Gifted a watch for 7000,others
+Purchased cosmetics for 1800,others
+Bought a camera lens for 12000,others
+Online course fee 999,others
+Bought a yoga mat for 900,others
+Donation to charity 2000,others
+Bought festival decorations for 1500,others
+New bedsheet for 800,others
+Purchased sunglasses for 2500,others
+Bought a gaming mouse for 3500,others
+Purchased action figures for 1200,others
+Bought a wallet for 1100,others
+Purchased paintings for 5000,others
+Bought home decor items for 1600,others
+Bought a pressure cooker for 2500,others
+Purchased a sewing machine for 7500,others
+Bought Bluetooth speaker for 4000,others
+Gifted chocolates worth 600,others
+Bought a cycle for 9000,others
+New table lamp for 1200,others
+Purchased gardening tools for 2000,others
+Bought kitchen utensils for 3000,others
+Gifted saree for 2500,others
+Bought a guitar for 8000,others
+Purchased bedsheets worth 1400,others
+Bought mobile cover for 350,others
+Purchased board games for 700,others
+Bought smartwatch strap for 400,others
+New bedsheet for 1000,others
+Bought an electric kettle for 2000,others
+Purchased camping tent for 7000,others
+Bought puzzle game for 600,others
+Gifted bracelet worth 4500,others
+Bought baby toys for 1200,others
+Purchased wall clock for 1500,others
+Bought floor mat for 900,others
+Purchased exercise band for 700,others
+Bought festive lights for 800,others
+Bought a study chair for 4000,others
+Purchased vacuum cleaner for 6500,others
+Bought an air purifier for 12000,others
+Gifted headphones worth 3000,others
+Bought car perfume for 600,others
+Purchased cycle helmet for 1500,others
+Bought Bluetooth earphones for 2000,others
+Bought a book set for 1800,others
+Purchased a sofa cover for 1400,others
+Bought phone charger for 800,others
+Gifted purse worth 2000,others
+Purchased duffle bag for 2500,others
+Bought sports shoes for 4500,others
+Bought trekking shoes for 6000,others
+Purchased makeup kit for 2200,others
+Bought alarm clock for 900,others
+Bought digital weighing scale for 1500,others
+Purchased dumbbells for 2500,others
+Bought kitchen mixer for 5000,others
+Bought raincoat for 1200,others
+Purchased umbrella for 800,others
+Gifted perfume worth 2500,others
+Bought a microwave for 9000,others
+Bought a cricket ball set for 700,others
+Purchased drawing kit for 1200,others
+Bought badminton racket for 2200,others
+Purchased skincare kit for 1800,others
+Bought electric shaver for 3000,others
+Bought ice cream for 300,others
+Purchased a diary for 400,others
+Bought jewelry box for 1500,others
+Bought smartwatch charger for 700,others
+Purchased gift card worth 2000,others
+Bought wireless keyboard for 2500,others
+Bought pen drive for 900,others
+Purchased power bank for 1800,others
+Bought gaming chair for 15000,others
+Purchased study table for 6500,others
+Bought bean bag for 4000,others
+Gifted flowers worth 1200,others
+Bought a wall shelf for 1800,others
+Purchased guitar strings for 600,others
+Bought roller skates for 2500,others
+Bought action camera for 8000,others
+Purchased makeup brushes for 1500,others
+Bought water bottle for 500,others
+Purchased face cream for 700,others
+Bought cycle lock for 400,others
+Bought skipping rope for 250,others
+Purchased festival sweets for 1500,others
+Bought gaming headphones for 5000,others
+Bought a drone for 25000,others
