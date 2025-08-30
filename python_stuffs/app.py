@@ -77,8 +77,8 @@ else:
 totals = {
     "Transport": 0.0,
     "Healthcare": 0.0,
-    "Food & Groceries": 0.0,
-    "Housing & Utilities": 0.0,
+    "Food": 0.0,
+    "Housing": 0.0,
     "Education": 0.0,
     "others": 0.0
 }
