@@ -26,7 +26,7 @@ class ExpenseClassifier(nn.Module):
 # Parameters
 # -------------------
 INPUT_SIZE = 561  # must match training
-HIDDEN_SIZE = 100
+HIDDEN_SIZE = 128
 
 # -------------------
 # Flask app
