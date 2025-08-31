@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[77]:
+# In[116]:
 
 
 import torch
@@ -14,7 +14,7 @@ import pandas as pd
 import os
 
 
-# In[78]:
+# In[117]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -23,7 +23,7 @@ device
 
 
 
-# In[79]:
+# In[118]:
 
 
 # csv_path = r"C:\Users\final\FinancialTrackerApp\model_code\expenses_data.csv"
@@ -35,7 +35,7 @@ texts = df['text']
 labels = df['category']  
 
 
-# In[80]:
+# In[119]:
 
 
 #converting text data into numerical vectors
@@ -44,7 +44,7 @@ X = vectorizer.fit_transform(texts)
 X.shape
 
 
-# In[81]:
+# In[120]:
 
 
 # Encoding the labels
@@ -53,7 +53,7 @@ y = encoder.fit_transform(labels)
 y
 
 
-# In[82]:
+# In[121]:
 
 
 #Train and test split
@@ -70,7 +70,7 @@ X_test = torch.tensor(X_test, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.long)
 
 
-# In[83]:
+# In[122]:
 
 
 X_train = X_train.to(device)
@@ -79,7 +79,7 @@ X_test = X_test.to(device)
 y_test = y_test.to(device)
 
 
-# In[84]:
+# In[123]:
 
 
 #Define model
@@ -97,13 +97,13 @@ class ExpenseClassifier(nn.Module):
         return out
 
 
-# In[85]:
+# In[124]:
 
 
 X_train.shape[1]
 
 
-# In[86]:
+# In[125]:
 
 
 input_size = X_train.shape[1]
@@ -114,7 +114,7 @@ model = ExpenseClassifier(input_size, hidden_size, num_classes)
 model.to(device)
 
 
-# In[87]:
+# In[126]:
 
 
 #Loss and optimizer
@@ -122,7 +122,7 @@ criterion = nn.CrossEntropyLoss() # compares predicted catgeory vs actual
 optimizer = optim.Adam(model.parameters(), lr=0.01) # updates model weights efficiently
 
 
-# In[88]:
+# In[127]:
 
 
 #Training loop
@@ -138,7 +138,7 @@ for epoch in range(epochs):
         print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
 
 
-# In[89]:
+# In[128]:
 
 
 #Evaluation
@@ -149,17 +149,12 @@ with torch.inference_mode():
     print(f'Accuracy: {acc.item():.4f}')
 
 
-# In[90]:
+# In[129]:
 
 
 import torch
 import joblib
 import os
-
-# Assume you already trained
-# vectorizer = TfidfVectorizer().fit(texts)
-# model = ExpenseClassifier(input_size=..., hidden_size=..., output_size=...) ; model trained
-# y_train = list of categories in training set (e.g., ["Transport", "Healthcare", ...])
 
 save_dir = "pytorch_models"
 os.makedirs(save_dir, exist_ok=True)
@@ -167,17 +162,17 @@ os.makedirs(save_dir, exist_ok=True)
 # Save TF-IDF vectorizer
 joblib.dump(vectorizer, os.path.join(save_dir, "vectorizer.pkl"))
 
-# Save model weights only
+# Save model weights
 torch.save(model.state_dict(), os.path.join(save_dir, "category_predictor_model.pth"))
 
-# Save category mapping (encoder) using PyTorch
-category_list = ["Transport", "Healthcare", "Food", "Housing", "Education", "others"]
+# Save category mapping using PyTorch (from the LabelEncoder)
+category_list = list(encoder.classes_)  # this preserves exact order
 torch.save(category_list, os.path.join(save_dir, "encoder.pth"))
 
 print("✅ Vectorizer, model weights, and encoder saved")
 
 
-# In[91]:
+# In[134]:
 
 
 import spacy
@@ -220,11 +215,13 @@ predict("Taxi fare as 300")
 predict("Netflix subscription as 500") 
 predict("Train from Velachery as 150") 
 predict("Spent 500 at hotel")
+predict("Spent 500000 on sons tuition fee")
+predict("Medical fee 500")
 
 print(totals)
 
 
-# In[92]:
+# In[131]:
 
 
 import spacy
@@ -235,7 +232,7 @@ for ent in doc.ents:
     print(ent.text, ent.label_)
 
 
-# In[93]:
+# In[132]:
 
 
 import os
@@ -243,12 +240,11 @@ print(os.getcwd())
 
 
 
-# In[94]:
+# In[133]:
 
 
-encoder_path = os.path.join("model_code", "pytorch_models", "encoder.pkl")
-encoder = joblib.load(encoder_path)
-print(encoder.classes_)
+print("Training order:", list(encoder.classes_))
+
 
 
 
