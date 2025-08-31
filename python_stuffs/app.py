@@ -25,7 +25,7 @@ class ExpenseClassifier(nn.Module):
 # -------------------
 # Parameters
 # -------------------
-INPUT_SIZE = 561  # must match training
+INPUT_SIZE = 563  # must match training
 HIDDEN_SIZE = 128
 
 # -------------------

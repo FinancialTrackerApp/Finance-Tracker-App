@@ -60,7 +60,7 @@ class MyAppState extends ChangeNotifier {
       } else {
         print("Error: ${response.statusCode}");
       }
-    } catch (e) {
+    } catch (e) { 
       print("Exception: $e");
     }
     isLoading = false;
