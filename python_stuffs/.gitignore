@@ -9,3 +9,5 @@ __pycache__/
 
 # Ignore Jupyter checkpoints
 .ipynb_checkpoints/
+
+env
