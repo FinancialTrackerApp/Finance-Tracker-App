@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 void main() {
   runApp(MyApp());
 }
@@ -177,6 +178,7 @@ class GeneratorPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              DateTimeDisplayWidget(),
               // Input TextField
               Spacer(),
               TextField(
@@ -383,3 +385,49 @@ class _AnimatedNoteEditorState extends State<AnimatedNoteEditor> {
     );
   }
 }
+
+
+class DateTimeDisplayWidget extends StatefulWidget {
+  const DateTimeDisplayWidget({Key? key}) : super(key: key);
+
+  @override
+  State<DateTimeDisplayWidget> createState() => _DateTimeDisplayWidgetState();
+}
+
+class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
+  late String formattedDateTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateDateTime();
+    // Update every second
+    Future.delayed(Duration.zero, _tick);
+  }
+
+  void _updateDateTime() {
+    DateTime now = DateTime.now();
+    formattedDateTime = DateFormat('yyyy-MM-dd – HH:mm:ss').format(now);
+  }
+
+  void _tick() async {
+    while (mounted) {
+      await Future.delayed(Duration(seconds: 1));
+      setState(() {
+        _updateDateTime();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      formattedDateTime,
+        style: GoogleFonts.lato(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+    );
+  }
+}
+
