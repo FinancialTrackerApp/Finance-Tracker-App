@@ -75,8 +75,6 @@ class MyAppState extends ChangeNotifier {
     editingIndex = index; // track which note is being edited
     notifyListeners();
   }
-
-
   void stopEditing() {
     isEditing = false;
     currentText = "";
@@ -130,37 +128,43 @@ class _MyHomePageState extends State<MyHomePage> {
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
-    return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Row(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Expense Tracker",
+          style: GoogleFonts.lato(
+            fontSize: 20,
+          ),
+        ),
+
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu), // hamburger menu
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
           children: [
-            SafeArea(
-              child: NavigationRail(
-                extended: constraints.maxWidth >= 600,
-                destinations: [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.home),
-                    label: Text('Home'),
-                  )
-                ],
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                  });
-                },
-              ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text("Home"),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 0;
+                });
+                Navigator.of(context).pop(); // close drawer
+              },
             ),
-            Expanded(
-              child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: page,
-              ),
-            ),
+            // Add more items here
           ],
         ),
-      );
-    });
+      ),
+      body: Container(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        child: page,
+      ),
+    );
   }
 }
 
@@ -178,7 +182,23 @@ class GeneratorPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DateTimeDisplayWidget(),
+              Row(
+                children: [
+                  DateTimeDisplayWidget(),
+                  Spacer(),
+                  ElevatedButton(
+                    onPressed: () => appState.startEditing(),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // circular edges
+                      ),
+                      padding: EdgeInsets.all(5), // makes it square-ish
+                    ),
+                    child: Icon(Icons.edit),
+                  )
+
+                ],
+              ),
               // Input TextField
               Spacer(),
               TextField(
@@ -200,11 +220,6 @@ class GeneratorPage extends StatelessWidget {
                     label: Text('Predict'),
                   ),
                   SizedBox(width: 10),
-                  ElevatedButton.icon(
-                    onPressed: () => appState.startEditing(),
-                    icon: Icon(Icons.edit),
-                    label: Text('Create Note'),
-                  ),
                 ],
               ),
               SizedBox(height: 20),
@@ -407,7 +422,7 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
 
   void _updateDateTime() {
     DateTime now = DateTime.now();
-    formattedDateTime = DateFormat('yyyy-MM-dd – HH:mm:ss').format(now);
+    formattedDateTime = DateFormat('yyyy|MM|dd').format(now);
   }
 
   void _tick() async {
