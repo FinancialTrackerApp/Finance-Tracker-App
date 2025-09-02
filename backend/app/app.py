@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import torch
 import torch.nn as nn
 import joblib
-import spacy
 import os
 import re
 
@@ -33,21 +32,17 @@ HIDDEN_SIZE = 128
 # -------------------
 app = Flask(__name__)
 
-# -------------------
-# Load SpaCy
-# -------------------
-nlp = spacy.load("en_core_web_sm")
 
 # -------------------
 # Load saved vectorizer
 # -------------------
-vectorizer_path = os.path.join("model_code", "pytorch_models", "vectorizer.pkl")
+vectorizer_path = os.path.join("models","vectorizer.pkl")
 vectorizer = joblib.load(vectorizer_path)
 
 # -------------------
 # Load model
 # -------------------
-model_path = os.path.join("model_code", "pytorch_models", "category_predictor_model.pth")
+model_path = os.path.join("models", "category_predictor_model.pth")
 torch.serialization.add_safe_globals([ExpenseClassifier])
 num_classes = 6
 model = ExpenseClassifier(INPUT_SIZE, HIDDEN_SIZE, num_classes)
@@ -60,7 +55,7 @@ model.eval()
 # -------------------
 # Load encoder
 # -------------------
-encoder_path = os.path.join("model_code", "pytorch_models", "encoder.pth")
+encoder_path = os.path.join("models", "encoder.pth")
 CATEGORY_MAPPING = torch.load(encoder_path)  # exact class order from training
 print("Category mapping:", CATEGORY_MAPPING)
 
@@ -83,13 +78,7 @@ def predict_category_and_amount(text):
     category = CATEGORY_MAPPING[pred_idx]
 
     # Extract amounts
-    amount = 0.0
-    doc = nlp(text)
-    for ent in doc.ents:
-        if ent.label_ in ["MONEY", "CARDINAL"]:
-            nums = re.findall(r'\d+', ent.text.replace(',', ''))
-            if nums:
-                amount += float(nums[0])
+    amount = extract_amount(text)
 
     totals[category] += amount
 
@@ -99,6 +88,14 @@ def predict_category_and_amount(text):
     print(f"Updated totals: {totals}")
 
     return category, amount, totals
+
+def extract_amount(text: str) -> float:
+    # Look for any number in the text
+    matches = re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?", text)
+    if matches:
+        # Remove commas and convert to float
+        return float(matches[0].replace(",", ""))
+    return 0.0
 
 # -------------------
 # Flask route
