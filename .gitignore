@@ -11,3 +11,8 @@ __pycache__/
 .ipynb_checkpoints/
 
 .env
+
+# Default ignored files
+/shelf/
+/workspace.xml
+
