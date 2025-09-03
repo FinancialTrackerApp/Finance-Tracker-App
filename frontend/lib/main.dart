@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:async';
 void main() {
   runApp(MyApp());
 }
@@ -45,25 +46,36 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> predict() async {
-    if (userInput.isEmpty) return;
+  Future<void> predict([String? text]) async {
+    final input = text ?? userInput; // Use provided text OR fallback to userInput
+    if (input.isEmpty) return;
+
     isLoading = true;
     notifyListeners();
+
     try {
-      final url = Uri.parse("http://127.0.0.1:5000/predict");
+      // Use current date in ISO format
+      final now = DateTime.now().toIso8601String();
+
+      final url = Uri.parse("http://127.0.0.1:8000/predict"); // adjust if using physical device
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: json.encode({"text": userInput}),
+        body: json.encode({
+          "text": input,
+          "date": now, // <-- send the date field
+        }),
       );
+
       if (response.statusCode == 200) {
-        totals = json.decode(response.body);
+        totals = json.decode(response.body); // update totals box
       } else {
         print("Error: ${response.statusCode}");
       }
-    } catch (e) { 
+    } catch (e) {
       print("Exception: $e");
     }
+
     isLoading = false;
     notifyListeners();
   }
@@ -81,15 +93,23 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
   void saveNote() {
-    if (currentText.trim().isEmpty) {
+    final noteText = currentText.trim();
+
+    if (noteText.isEmpty) {
       stopEditing();
       return;
     }
+
+    // Save or update note
     if (editingIndex != null) {
-      notes[editingIndex!] = Note(text: currentText); // update existing
+      notes[editingIndex!] = Note(text: noteText);
     } else {
-      notes.add(Note(text: currentText)); // add new
+      notes.add(Note(text: noteText));
     }
+
+    // Call predict() with the saved note's text
+    predict(noteText);
+
     stopEditing();
   }
 
@@ -174,128 +194,99 @@ class GeneratorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
     final size = MediaQuery.of(context).size;
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  DateTimeDisplayWidget(),
-                  Spacer(),
-                  ElevatedButton(
-                    onPressed: () => appState.startEditing(),
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // circular edges
-                      ),
-                      padding: EdgeInsets.all(5), // makes it square-ish
-                    ),
-                    child: Icon(Icons.edit),
-                  )
 
-                ],
-              ),
-              // Input TextField
-              Spacer(),
-              TextField(
-                onChanged: (text) => appState.updateInput(text),
-                decoration: InputDecoration(
-                  labelText: "Enter expense text",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 12),
-              // Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () => appState.predict(),
-                    icon: Icon(Icons.arrow_right),
-                    label: Text('Predict'),
-                  ),
-                  SizedBox(width: 10),
-                ],
-              ),
-              SizedBox(height: 20),
-              // Totals box
-              Align(
-                alignment: Alignment.center, // align container to left
-                child: IntrinsicWidth( // shrink container to fit text
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black54),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white,
-                    ),
-                    child: appState.isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : appState.totals.isEmpty
-                        ? Text("Totals will appear here", textAlign: TextAlign.left)
-                        : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: appState.totals.entries
-                          .map((e) => Text("${e.key}: ₹${e.value}"))
-                          .toList(),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 12),
-              // Notes list
-              Expanded(
-                child: ListView(
-                  children: appState.notes
-                      .asMap()
-                      .entries
-                      .map((entry) {
-                    int idx = entry.key;
-                    Note note = entry.value;
-                    return GestureDetector(
-                      onTap: () {
-                        appState.startEditing(text: note.text, index: idx);
-                      },
-                      child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 6),
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.yellow[100],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                note.text,
-                                maxLines: 5,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => appState.deleteNoteAt(idx),
-                            ),
-                          ],
-                        ),
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer, // ✅ Back to light blue
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                DateTimeDisplayWidget(),
+                SizedBox(height: 20),
+
+                // Totals box
+                Align(
+                  alignment: Alignment.center,
+                  child: IntrinsicWidth(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black54),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white, // ✅ Totals box stays white
                       ),
-                    );
-                  })
-                      .toList(),
+                      child: appState.isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : appState.totals.isEmpty
+                          ? const Text("Today's Totals:", textAlign: TextAlign.left)
+                          : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: appState.totals.entries
+                            .map((e) => Text("${e.key}: ₹${e.value}"))
+                            .toList(),
+                      ),
+                    ),
+                  ),
                 ),
-              )
-            ],
+
+                const SizedBox(height: 12),
+
+                // Notes list
+                Expanded(
+                  child: ListView(
+                    children: appState.notes
+                        .asMap()
+                        .entries
+                        .map((entry) {
+                      int idx = entry.key;
+                      Note note = entry.value;
+                      return GestureDetector(
+                        onTap: () {
+                          appState.startEditing(text: note.text, index: idx);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  note.text,
+                                  maxLines: 5,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => appState.deleteNoteAt(idx),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        // Animated Note Editor Overlay
-        if (appState.isEditing) AnimatedNoteEditor(),
-      ],
+
+          // Animated Note Editor Overlay
+          if (appState.isEditing) AnimatedNoteEditor(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => appState.startEditing(),
+        child: const Icon(Icons.edit, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
@@ -400,49 +391,73 @@ class _AnimatedNoteEditorState extends State<AnimatedNoteEditor> {
     );
   }
 }
-
-
 class DateTimeDisplayWidget extends StatefulWidget {
   const DateTimeDisplayWidget({Key? key}) : super(key: key);
-
   @override
   State<DateTimeDisplayWidget> createState() => _DateTimeDisplayWidgetState();
 }
 
 class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
   late String formattedDateTime;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _updateDateTime();
-    // Update every second
-    Future.delayed(Duration.zero, _tick);
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() => _updateDateTime());
+      }
+    });
   }
 
   void _updateDateTime() {
     DateTime now = DateTime.now();
-    formattedDateTime = DateFormat('yyyy|MM|dd').format(now);
+
+    // Format weekday, day with suffix, and month
+    String weekday = DateFormat('EEEE').format(now);
+    String month = DateFormat('MMMM').format(now);
+    int day = now.day;
+
+    String suffix;
+    if (day >= 11 && day <= 13) {
+      suffix = "th";
+    } else {
+      switch (day % 10) {
+        case 1:
+          suffix = "st";
+          break;
+        case 2:
+          suffix = "nd";
+          break;
+        case 3:
+          suffix = "rd";
+          break;
+        default:
+          suffix = "th";
+      }
+    }
+
+    formattedDateTime = "$weekday, $day$suffix $month";
   }
 
-  void _tick() async {
-    while (mounted) {
-      await Future.delayed(Duration(seconds: 1));
-      setState(() {
-        _updateDateTime();
-      });
-    }
+  @override
+  void dispose() {
+    _timer?.cancel(); // ✅ Stop the timer when widget is removed
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Text(
       formattedDateTime,
-        style: GoogleFonts.lato(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
+      style: GoogleFonts.lato(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 }
+
 
