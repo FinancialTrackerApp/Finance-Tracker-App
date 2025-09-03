@@ -24,28 +24,31 @@ class ExpenseClassifier(nn.Module):
 # -------------------
 # Parameters
 # -------------------
-INPUT_SIZE = 563  # must match training
+INPUT_SIZE = 564  # must match training
 HIDDEN_SIZE = 128
+NUM_CLASSES = 6   # must match encoder/classes
 
 # -------------------
 # Flask app
 # -------------------
 app = Flask(__name__)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))   # backend/app
+MODEL_DIR = os.path.join(BASE_DIR, "..", "models")      # backend/models
 
 # -------------------
 # Load saved vectorizer
 # -------------------
-vectorizer_path = os.path.join("models","vectorizer.pkl")
+vectorizer_path = os.path.join(MODEL_DIR, "vectorizer.pkl")
 vectorizer = joblib.load(vectorizer_path)
 
 # -------------------
 # Load model
 # -------------------
-model_path = os.path.join("models", "category_predictor_model.pth")
+model_path = os.path.join(MODEL_DIR, "category_predictor_model.pth")
 torch.serialization.add_safe_globals([ExpenseClassifier])
-num_classes = 6
-model = ExpenseClassifier(INPUT_SIZE, HIDDEN_SIZE, num_classes)
+model = ExpenseClassifier(INPUT_SIZE, HIDDEN_SIZE, NUM_CLASSES)
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 state_dict = torch.load(model_path, map_location=device)
 model.load_state_dict(state_dict)
@@ -53,9 +56,9 @@ model.to(device)
 model.eval()
 
 # -------------------
-# Load encoder
+# Load encoder (category list)
 # -------------------
-encoder_path = os.path.join("models", "encoder.pth")
+encoder_path = os.path.join(MODEL_DIR, "encoder.pth")
 CATEGORY_MAPPING = torch.load(encoder_path)  # exact class order from training
 print("Category mapping:", CATEGORY_MAPPING)
 
@@ -79,7 +82,6 @@ def predict_category_and_amount(text):
 
     # Extract amounts
     amount = extract_amount(text)
-
     totals[category] += amount
 
     print(f"Text: {text}")
@@ -93,7 +95,6 @@ def extract_amount(text: str) -> float:
     # Look for any number in the text
     matches = re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?", text)
     if matches:
-        # Remove commas and convert to float
         return float(matches[0].replace(",", ""))
     return 0.0
 
