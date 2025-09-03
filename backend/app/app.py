@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import torch
 import torch.nn as nn
 import joblib
@@ -29,9 +30,9 @@ HIDDEN_SIZE = 128
 NUM_CLASSES = 6   # must match encoder/classes
 
 # -------------------
-# Flask app
+# FastAPI app
 # -------------------
-app = Flask(__name__)
+app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))   # backend/app
 MODEL_DIR = os.path.join(BASE_DIR, "..", "models")      # backend/models
@@ -68,9 +69,16 @@ print("Category mapping:", CATEGORY_MAPPING)
 totals = {cat: 0.0 for cat in CATEGORY_MAPPING}
 
 # -------------------
+# Request schema
+# -------------------
+class ExpenseRequest(BaseModel):
+    text: str
+    date: str
+
+# -------------------
 # Prediction function
 # -------------------
-def predict_category_and_amount(text):
+def predict_category_and_amount(text: str):
     # Vectorize input and move to device
     vec = vectorizer.transform([text]).toarray()
     vec = torch.tensor(vec, dtype=torch.float32).to(device)
@@ -92,27 +100,20 @@ def predict_category_and_amount(text):
     return category, amount, totals
 
 def extract_amount(text: str) -> float:
-    # Look for any number in the text
     matches = re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?", text)
     if matches:
         return float(matches[0].replace(",", ""))
     return 0.0
 
 # -------------------
-# Flask route
+# FastAPI route
 # -------------------
-@app.route("/predict", methods=["POST"])
-def predict_expense():
-    data = request.get_json()
-    text = data.get("text", "")
-    if not text:
-        return jsonify({"error": "No text provided"}), 400
+@app.post("/predict")
+async def predict_expense(req: ExpenseRequest):
+    if not req.text:
+        raise HTTPException(status_code=400, detail="No text provided")
+    if not req.date:
+        raise HTTPException(status_code=400, detail="No date provided")
 
-    _, _, updated_totals = predict_category_and_amount(text)
-    return jsonify(updated_totals)
-
-# -------------------
-# Run server
-# -------------------
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    _, _, updated_totals = predict_category_and_amount(req.text)
+    return updated_totals
