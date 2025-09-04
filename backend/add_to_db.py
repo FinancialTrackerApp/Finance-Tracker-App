@@ -61,6 +61,17 @@ def add_entry(date, text, category, amount):
     print(f"Added entry: {date}, {category}, {amount}, {text}")
     conn.commit()
     conn.close()
+    
+def delete_entry_by_id(entry_id):
+    """Delete an expense entry by its ID."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM expenses WHERE id = ?", (entry_id,))
+    conn.commit()
+    conn.close()
+    
+    print(f"Deleted entry with ID: {entry_id}")
 
 def get_total_by_date(date):
     """Get the total amount spent on a given date from expenses."""

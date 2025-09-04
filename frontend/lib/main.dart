@@ -30,8 +30,10 @@ class MyApp extends StatelessWidget {
 
 // App state
 class Note {
-  String text;
-  Note({required this.text});
+  final int id;
+  final String text;
+
+  Note({required this.id, required this.text});
 }
 
 class MyAppState extends ChangeNotifier {
@@ -48,40 +50,40 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> predict([String? text]) async {
-    final input = text ?? userInput; // Use provided text OR fallback to userInput
-    if (input.isEmpty) return;
-
-    isLoading = true;
-    notifyListeners();
-
-    try {
-      // Use current date in ISO format
-      final noww = DateTime.now();
-      final now = DateFormat('dd-MM-yyyy').format(noww);
-
-      final url = Uri.parse("http://127.0.0.1:8000/predict"); // adjust if using physical device
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "text": input,
-          "date": now, // <-- send the date field
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        totals = json.decode(response.body); // update totals box
-      } else {
-        print("Error: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Exception: $e");
-    }
-
-    isLoading = false;
-    notifyListeners();
-  }
+  // Future<void> predict([String? text]) async {
+  //   final input = text ?? userInput; // Use provided text OR fallback to userInput
+  //   if (input.isEmpty) return;
+  //
+  //   isLoading = true;
+  //   notifyListeners();
+  //
+  //   try {
+  //     // Use current date in ISO format
+  //     final noww = DateTime.now();
+  //     final now = DateFormat('dd-MM-yyyy').format(noww);
+  //
+  //     final url = Uri.parse("http://127.0.0.1:8000/predict"); // adjust if using physical device
+  //     final response = await http.post(
+  //       url,
+  //       headers: {"Content-Type": "application/json"},
+  //       body: json.encode({
+  //         "text": input,
+  //         "date": now, // <-- send the date field
+  //       }),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       totals = json.decode(response.body); // update totals box
+  //     } else {
+  //       print("Error: ${response.statusCode}");
+  //     }
+  //   } catch (e) {
+  //     print("Exception: $e");
+  //   }
+  //
+  //   isLoading = false;
+  //   notifyListeners();
+  // }
 
   // Notes logic
   void startEditing({String text = "", int? index}) {
@@ -95,39 +97,98 @@ class MyAppState extends ChangeNotifier {
     currentText = "";
     notifyListeners();
   }
-  void saveNote() {
+  Future<void> saveNote() async {
     final noteText = currentText.trim();
-
     if (noteText.isEmpty) {
       stopEditing();
       return;
     }
 
-    // Save or update note
-    if (editingIndex != null) {
-      notes[editingIndex!] = Note(text: noteText);
-    } else {
-      notes.add(Note(text: noteText));
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      // Call backend /predict endpoint, which also saves the note
+      final url = Uri.parse("http://127.0.0.1:8000/predict");
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "text": noteText,
+          "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Update totals immediately from backend
+        if (data["Today's Total"] != null) {
+          totals = {"Today's Total": data["Today's Total"]};
+        }
+
+        // Refresh notes list from /expenses endpoint
+        await fetchNotes();
+
+        print("Saved successfully! Updated total: ${data["Today's Total"]}");
+      } else {
+        print("Failed to save note: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception while saving note: $e");
     }
 
-    // Call predict() with the saved note's text
-    predict(noteText);
-
+    isLoading = false;
     stopEditing();
+    notifyListeners();
   }
-
   void updateText(String text) {
     currentText = text;
     notifyListeners();
   }
 
-  void addNote(String text) {
-    notes.add(Note(text: text));
-    notifyListeners();
+
+  Future<void> fetchNotes() async {
+    final url = Uri.parse("http://127.0.0.1:8000/expenses");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      notes = data.map<Note>((item) {
+        return Note(id: item['id'], text: item['text']);
+      }).toList();
+      notifyListeners();
+    } else {
+      print("Failed to fetch notes: ${response.body}");
+    }
   }
-  void deleteNoteAt(int index) {
-    notes.removeAt(index);
-    notifyListeners();
+  Future<void> deleteNoteAt(int index) async {
+    final appState = this; // assuming this is inside MyAppState
+    final expenseId = notes[index].id;
+    final url = Uri.parse('http://127.0.0.1:8000/expenses/$expenseId');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Refresh notes list
+        await fetchNotes();
+
+        // Update totals using the backend's updated_total
+        if (data['updated_total'] != null) {
+          appState.totals = {"Today's Total": data['updated_total']};
+        }
+
+        notifyListeners();
+        print("Deleted successfully! Updated total: ${data['updated_total']}");
+      } else {
+        print("Failed to delete note: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception while deleting note: $e");
+    }
   }
 }
 
@@ -206,7 +267,21 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 // Generator page with input, buttons, totals, and notes
-class GeneratorPage extends StatelessWidget {
+class GeneratorPage extends StatefulWidget {
+  @override
+  State<GeneratorPage> createState() => _GeneratorPageState();
+}
+
+class _GeneratorPageState extends State<GeneratorPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch notes when the page loads
+    Future.microtask(() =>
+        Provider.of<MyAppState>(context, listen: false).fetchNotes()
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
