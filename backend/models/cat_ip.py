@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[116]:
+# In[1]:
 
 
 import torch
@@ -14,7 +14,7 @@ import pandas as pd
 import os
 
 
-# In[117]:
+# In[2]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -23,19 +23,27 @@ device
 
 
 
-# In[118]:
+# In[ ]:
 
 
-# csv_path = r"C:\Users\final\FinancialTrackerApp\model_code\expenses_data.csv"
-csv_path = r"D:\Programming\Projects\Finance-Tracker-App\python_stuffs\model_code\expenses_data_cleaned.csv"
-# BASE_DIR = os.path.join(os.getcwd(), "model_code")
-# csv_path = os.path.join(BASE_DIR, "expenses_data.csv")
+# Get current working directory (where Jupyter is running)
+cwd = os.getcwd()
+
+# Build the correct path relative to your notebook
+csv_path = os.path.join(cwd, "..", "data", "text_category.csv")
+
+# Normalize the path (resolves ..)
+csv_path = os.path.abspath(csv_path)
+
+print("CSV Path:", csv_path)
+
 df = pd.read_csv(csv_path)
-texts = df['text']       
-labels = df['category']  
+# Extract columns
+texts = df['text']
+labels = df['category']
 
 
-# In[119]:
+# In[4]:
 
 
 #converting text data into numerical vectors
@@ -44,7 +52,7 @@ X = vectorizer.fit_transform(texts)
 X.shape
 
 
-# In[120]:
+# In[5]:
 
 
 # Encoding the labels
@@ -53,7 +61,7 @@ y = encoder.fit_transform(labels)
 y
 
 
-# In[121]:
+# In[6]:
 
 
 #Train and test split
@@ -70,7 +78,7 @@ X_test = torch.tensor(X_test, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.long)
 
 
-# In[122]:
+# In[7]:
 
 
 X_train = X_train.to(device)
@@ -79,7 +87,7 @@ X_test = X_test.to(device)
 y_test = y_test.to(device)
 
 
-# In[123]:
+# In[8]:
 
 
 #Define model
@@ -97,24 +105,24 @@ class ExpenseClassifier(nn.Module):
         return out
 
 
-# In[124]:
+# In[9]:
 
 
 X_train.shape[1]
 
 
-# In[125]:
+# In[10]:
 
 
 input_size = X_train.shape[1]
-hidden_size = 64
+hidden_size = 128
 num_classes = len(set(y))
 
 model = ExpenseClassifier(input_size, hidden_size, num_classes)
 model.to(device)
 
 
-# In[126]:
+# In[11]:
 
 
 #Loss and optimizer
@@ -122,11 +130,11 @@ criterion = nn.CrossEntropyLoss() # compares predicted catgeory vs actual
 optimizer = optim.Adam(model.parameters(), lr=0.01) # updates model weights efficiently
 
 
-# In[127]:
+# In[12]:
 
 
 #Training loop
-epochs = 200
+epochs = 500
 for epoch in range(epochs):
     outputs = model(X_train)
     loss = criterion(outputs, y_train)
@@ -138,7 +146,7 @@ for epoch in range(epochs):
         print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
 
 
-# In[128]:
+# In[13]:
 
 
 #Evaluation
@@ -149,14 +157,14 @@ with torch.inference_mode():
     print(f'Accuracy: {acc.item():.4f}')
 
 
-# In[129]:
+# In[14]:
 
 
 import torch
 import joblib
 import os
 
-save_dir = "pytorch_models"
+save_dir = "."   # current directory (your models folder)
 os.makedirs(save_dir, exist_ok=True)
 
 # Save TF-IDF vectorizer
@@ -169,10 +177,8 @@ torch.save(model.state_dict(), os.path.join(save_dir, "category_predictor_model.
 category_list = list(encoder.classes_)  # this preserves exact order
 torch.save(category_list, os.path.join(save_dir, "encoder.pth"))
 
-print("✅ Vectorizer, model weights, and encoder saved")
 
-
-# In[134]:
+# In[15]:
 
 
 import spacy
@@ -183,7 +189,7 @@ totals = {
     "Food": 0.0,
     "Housing": 0.0,
     "Education": 0.0,
-    "others": 0.0
+    "Others": 0.0
 }
 
 def predict(text):
@@ -209,19 +215,19 @@ def predict(text):
     totals[pred] += amount
     # return totals
 # testing:
-predict("Bought apples for 80 rs")   
-predict("Hospital bill as 750")   
-predict("Taxi fare as 300")       
-predict("Netflix subscription as 500") 
-predict("Train from Velachery as 150") 
-predict("Spent 500 at hotel")
-predict("Spent 500000 on sons tuition fee")
+# predict("Bought apples for 80 rs")   
+# predict("Hospital bill as 750")   
+# predict("Taxi fare as 300")       
+# predict("Netflix subscription as 500") 
+# predict("Train from Velachery as 150") 
+# predict("Spent 500 for spinach")
+# predict("Spent 500000 on sons tuition fee")
 predict("Medical fee 500")
 
 print(totals)
 
 
-# In[131]:
+# In[16]:
 
 
 import spacy
@@ -232,7 +238,7 @@ for ent in doc.ents:
     print(ent.text, ent.label_)
 
 
-# In[132]:
+# In[17]:
 
 
 import os
@@ -240,7 +246,7 @@ print(os.getcwd())
 
 
 
-# In[133]:
+# In[18]:
 
 
 print("Training order:", list(encoder.classes_))
