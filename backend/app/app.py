@@ -5,7 +5,8 @@ import torch.nn as nn
 import joblib
 import os
 import re
-from backend.add_to_db import add_entry,get_total_by_date  # <-- import
+from ..add_to_db import add_entry, get_total_by_date
+
 
 # -------------------
 # Define model
@@ -127,4 +128,6 @@ async def predict_expense(req: ExpenseRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DB save failed: {str(e)}")
-    return {"total_amount": get_total_by_date(req.date)}
+    Total_amount_on_date = get_total_by_date(req.date)
+    print(f"Total on {req.date}: {Total_amount_on_date}")
+    return {"total_amount": Total_amount_on_date}
