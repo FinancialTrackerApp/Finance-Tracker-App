@@ -1,4 +1,5 @@
 #Backend
+- to run the backend server be in the main folder and run uvicorn backend.app.app:app --reload
 - Database Structure:-
     Table name - expenses
     sample table structure

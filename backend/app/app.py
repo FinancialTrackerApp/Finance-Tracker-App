@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import torch
@@ -6,6 +7,16 @@ import joblib
 import os
 import re
 from ..add_to_db import add_entry, get_total_by_date
+from torch.nn import functional as F
+
+# Configure logger
+logging.basicConfig(
+    level=logging.INFO,  # or DEBUG for more details
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
+
 
 # -------------------
 # Define model
@@ -52,6 +63,9 @@ class ExpenseRequest(BaseModel):
     text: str
     date: str
 
+def normalize_text(text: str) -> str:
+    # Replace all numbers (like 5, 100, 2500) with <NUM>
+    return re.sub(r"\d+", "<NUM>", text)
 # -------------------
 # Helpers
 # -------------------
@@ -59,19 +73,20 @@ def extract_amount(text: str) -> float:
     matches = re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?", text)
     return float(matches[0].replace(",", "")) if matches else 0.0
 
-def predict_category_and_amount(text: str, threshold: float = 0.7):
-    vec = vectorizer.transform([text]).toarray()
+def predict_category_and_amount(text: str, threshold: float = 0.6):
+    text_without_numbers = normalize_text(text)
+    vec = vectorizer.transform([text_without_numbers]).toarray()
     vec = torch.tensor(vec, dtype=torch.float32).to(device)
 
     output = model(vec)
-    probs = torch.softmax(output, dim=1)
+    probs = F.softmax(output, dim=1)
     max_prob, pred_idx = torch.max(probs, dim=1)
 
     if max_prob.item() < threshold:
         pred_category = "Others"
     else:
         pred_category = CATEGORY_MAPPING[pred_idx.item()]
-
+    logger.info(f"Predicted: {pred_category} with prob {max_prob.item():.4f}")
     return pred_category, extract_amount(text)
 
 # -------------------
@@ -92,4 +107,5 @@ async def predict_expense(req: ExpenseRequest):
         raise HTTPException(status_code=500, detail=f"DB save failed: {str(e)}")
 
     total_amount = get_total_by_date(req.date)
+    logger.info(f"Total for {req.date}: {total_amount}")
     return {"total_amount": total_amount}
