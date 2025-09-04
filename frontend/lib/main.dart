@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
+import 'package:fl_chart/fl_chart.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -55,7 +57,8 @@ class MyAppState extends ChangeNotifier {
 
     try {
       // Use current date in ISO format
-      final now = DateTime.now().toIso8601String();
+      final noww = DateTime.now();
+      final now = DateFormat('dd-MM-yyyy').format(noww);
 
       final url = Uri.parse("http://127.0.0.1:8000/predict"); // adjust if using physical device
       final response = await http.post(
@@ -141,8 +144,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     Widget page;
     switch (selectedIndex) {
+      
       case 0:
         page = GeneratorPage();
+        break;
+      case 1:
+        page= GraphPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -172,6 +179,16 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 setState(() {
                   selectedIndex = 0;
+                });
+                Navigator.of(context).pop(); // close drawer
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.auto_graph),
+              title: Text("Expenditure Graph"),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 1;
                 });
                 Navigator.of(context).pop(); // close drawer
               },
@@ -287,6 +304,75 @@ class GeneratorPage extends StatelessWidget {
         child: const Icon(Icons.edit, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+}
+class GraphPage extends StatelessWidget {
+  final List<Map<String, dynamic>> monthlyData = [
+    {"month": "Jan", "total": 5000},
+    {"month": "Feb", "total": 6000},
+    {"month": "Mar", "total": 5500},
+    {"month": "Apr", "total": 7000},
+    {"month": "May", "total": 6500},
+    {"month": "Jun", "total": 7200},
+
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: LineChart(
+          LineChartData(
+            lineBarsData: [
+              LineChartBarData(
+                spots: monthlyData.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final data = entry.value;
+                  return FlSpot(idx.toDouble(), data['total'].toDouble());
+                }).toList(),
+                isCurved: true,
+                barWidth: 3,
+                dotData: FlDotData(show: true),
+                color: Colors.blue,
+              ),
+            ],
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final idx = value.toInt();
+                    if (idx < 0 || idx >= monthlyData.length) return Container();
+                    return Text(monthlyData[idx]['month']);
+                  },
+                  reservedSize: 30,
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+              ),
+            ),
+            gridData: FlGridData(show: true),
+            lineTouchData: LineTouchData(
+              enabled: true,
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipItems: (touchedSpots) {
+                  return touchedSpots.map((spot) {
+                    final idx = spot.spotIndex;
+                    return LineTooltipItem(
+                      "${monthlyData[idx]['month']}\n₹${spot.y.toStringAsFixed(0)}",
+                      const TextStyle(color: Colors.white),
+                    );
+                  }).toList();
+                },
+              ),
+            ),
+          ),
+        )
+      ),
     );
   }
 }
