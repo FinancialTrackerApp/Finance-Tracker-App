@@ -5,7 +5,7 @@ import torch.nn as nn
 import joblib
 import os
 import re
-from backend.add_to_db import add_category_data  # <-- import
+from backend.add_to_db import add_entry,get_total_by_date  # <-- import
 
 # -------------------
 # Define model
@@ -91,7 +91,6 @@ def predict_category_and_amount(text: str):
 
     # Extract amounts
     amount = extract_amount(text)
-    total_amount+=amount
     totals[category] += amount
 
     print(f"Text: {text}")
@@ -99,7 +98,7 @@ def predict_category_and_amount(text: str):
     print(f"Amount extracted: {amount}")
     print(f"Updated totals: {totals}")
 
-    return total_amount,totals
+    return totals, category, amount
 
 def extract_amount(text: str) -> float:
     matches = re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?", text)
@@ -117,15 +116,15 @@ async def predict_expense(req: ExpenseRequest):
     if not req.date:
         raise HTTPException(status_code=400, detail="No date provided")
 
-    total_amount,totals = predict_category_and_amount(req.text)
+    totals,category,amount = predict_category_and_amount(req.text)
     # Save to DB before returning
     try:
-        add_category_data(
-            text=req.text,
+        add_entry(
             date=req.date,
-            total_amount=total_amount,
-            totals=totals
+            text=req.text,
+            category=category,
+            amount=amount,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DB save failed: {str(e)}")
-    return {"total_amount": total_amount}
+    return {"total_amount": get_total_by_date(req.date)}
