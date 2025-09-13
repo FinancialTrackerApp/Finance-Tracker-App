@@ -121,12 +121,9 @@ def delete_expense(entry_id: int):
     cursor.execute("SELECT date FROM expenses WHERE id = ?", (entry_id,))
     row = cursor.fetchone()
     conn.close()
-
     if not row:
         raise HTTPException(status_code=404, detail=f"No expense found with ID {entry_id}")
-
     expense_date = row[0]
-
     # Delete the expense
     delete_entry_by_id(entry_id)
 
@@ -139,10 +136,18 @@ def delete_expense(entry_id: int):
         "updated_total": updated_total
     }
 @app.get("/expenses")
-def get_all_expenses():
+def get_all_expenses(date: str = None):
+    
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, text FROM expenses")
+    if date:
+        cursor.execute("SELECT id, text, category, amount FROM expenses WHERE TRIM(date) = ?", (date,))
+    else:
+        cursor.execute("SELECT id, text, category, amount FROM expenses")
     rows = cursor.fetchall()
+    print("Querying for date:", date)
+    print("Rows fetched from DB:", rows)
+    
     conn.close()
+ 
     return [{"id": row[0], "text": row[1]} for row in rows]

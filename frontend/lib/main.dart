@@ -44,6 +44,12 @@ class MyAppState extends ChangeNotifier {
   List<Note> notes = [];
   bool isEditing = false;
   String currentText = "";
+  DateTime currentDate = DateTime.now();
+
+  void setCurrentDate(DateTime newDate) {
+    currentDate = newDate;
+    notifyListeners();
+  }
 
   void updateInput(String newText) {
     userInput = newText;
@@ -128,7 +134,8 @@ class MyAppState extends ChangeNotifier {
         }
 
         // Refresh notes list from /expenses endpoint
-        await fetchNotes();
+        final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
+        await fetchNotes(date: formattedDate);
 
         print("Saved successfully! Updated total: ${data["Today's Total"]}");
       } else {
@@ -148,10 +155,11 @@ class MyAppState extends ChangeNotifier {
   }
 
 
-  Future<void> fetchNotes() async {
-    final url = Uri.parse("http://127.0.0.1:8000/expenses");
-    final response = await http.get(url);
+  Future<void> fetchNotes({required String date}) async {
 
+    final url = Uri.parse("http://127.0.0.1:8000/expenses?date=$date");
+    final response = await http.get(url);
+    print("$date");
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       notes = data.map<Note>((item) {
@@ -174,7 +182,9 @@ class MyAppState extends ChangeNotifier {
         final data = json.decode(response.body);
 
         // Refresh notes list
-        await fetchNotes();
+        final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
+
+        await fetchNotes(date: formattedDate);
 
         // Update totals using the backend's updated_total
         if (data['updated_total'] != null) {
@@ -205,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     Widget page;
     switch (selectedIndex) {
-      
+
       case 0:
         page = GeneratorPage();
         break;
@@ -269,16 +279,45 @@ class _MyHomePageState extends State<MyHomePage> {
 // Generator page with input, buttons, totals, and notes
 class GeneratorPage extends StatefulWidget {
   @override
+
   State<GeneratorPage> createState() => _GeneratorPageState();
+
 }
 
 class _GeneratorPageState extends State<GeneratorPage> {
+  DateTime currentDate = DateTime.now();
+  void goToPreviousDay() {
+    setState(() {
+      currentDate = currentDate.subtract(Duration(days: 1));
+    });
+
+    print("Fetching notes for: $currentDate");
+    fetchNotesForCurrentDate();
+  }
+
+  void goToNextDay() {
+    setState(() {
+      currentDate = currentDate.add(Duration(days: 1));
+    });
+    fetchNotesForCurrentDate();
+    print("Fetching notes for: $currentDate");
+  }
+
+  void fetchNotesForCurrentDate() {
+    print("Fetching notes for: $currentDate");
+    final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
+
+    Provider.of<MyAppState>(context, listen: false).fetchNotes(date: formattedDate);
+  }
   @override
   void initState() {
     super.initState();
+    // Fetch date when the page loads
+    fetchNotesForCurrentDate();
     // Fetch notes when the page loads
+    final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
     Future.microtask(() =>
-        Provider.of<MyAppState>(context, listen: false).fetchNotes()
+        Provider.of<MyAppState>(context, listen: false).fetchNotes(date: formattedDate)
     );
   }
 
@@ -295,7 +334,21 @@ class _GeneratorPageState extends State<GeneratorPage> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                DateTimeDisplayWidget(),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_left),
+                        onPressed: goToPreviousDay,
+                      ),
+                      DateTimeDisplayWidget(),
+                      IconButton(
+                        icon: Icon(Icons.arrow_right),
+                        onPressed: goToNextDay,
+                      ),
+                    ]
+                ),
+
                 SizedBox(height: 20),
 
                 // Totals box
@@ -326,6 +379,7 @@ class _GeneratorPageState extends State<GeneratorPage> {
                 const SizedBox(height: 12),
 
                 // Notes list
+
                 Expanded(
                   child: ListView(
                     children: appState.notes
@@ -398,55 +452,55 @@ class GraphPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: LineChart(
-          LineChartData(
-            lineBarsData: [
-              LineChartBarData(
-                spots: monthlyData.asMap().entries.map((entry) {
-                  final idx = entry.key;
-                  final data = entry.value;
-                  return FlSpot(idx.toDouble(), data['total'].toDouble());
-                }).toList(),
-                isCurved: true,
-                barWidth: 3,
-                dotData: FlDotData(show: true),
-                color: Colors.blue,
-              ),
-            ],
-            titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final idx = value.toInt();
-                    if (idx < 0 || idx >= monthlyData.length) return Container();
-                    return Text(monthlyData[idx]['month']);
-                  },
-                  reservedSize: 30,
+          padding: const EdgeInsets.all(16),
+          child: LineChart(
+            LineChartData(
+              lineBarsData: [
+                LineChartBarData(
+                  spots: monthlyData.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final data = entry.value;
+                    return FlSpot(idx.toDouble(), data['total'].toDouble());
+                  }).toList(),
+                  isCurved: true,
+                  barWidth: 3,
+                  dotData: FlDotData(show: true),
+                  color: Colors.blue,
+                ),
+              ],
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      final idx = value.toInt();
+                      if (idx < 0 || idx >= monthlyData.length) return Container();
+                      return Text(monthlyData[idx]['month']);
+                    },
+                    reservedSize: 30,
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: true, reservedSize: 40),
                 ),
               ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+              gridData: FlGridData(show: true),
+              lineTouchData: LineTouchData(
+                enabled: true,
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipItems: (touchedSpots) {
+                    return touchedSpots.map((spot) {
+                      final idx = spot.spotIndex;
+                      return LineTooltipItem(
+                        "${monthlyData[idx]['month']}\n₹${spot.y.toStringAsFixed(0)}",
+                        const TextStyle(color: Colors.white),
+                      );
+                    }).toList();
+                  },
+                ),
               ),
             ),
-            gridData: FlGridData(show: true),
-            lineTouchData: LineTouchData(
-              enabled: true,
-              touchTooltipData: LineTouchTooltipData(
-                getTooltipItems: (touchedSpots) {
-                  return touchedSpots.map((spot) {
-                    final idx = spot.spotIndex;
-                    return LineTooltipItem(
-                      "${monthlyData[idx]['month']}\n₹${spot.y.toStringAsFixed(0)}",
-                      const TextStyle(color: Colors.white),
-                    );
-                  }).toList();
-                },
-              ),
-            ),
-          ),
-        )
+          )
       ),
     );
   }
