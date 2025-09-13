@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -105,6 +106,7 @@ class MyAppState extends ChangeNotifier {
   }
   Future<void> saveNote() async {
     final noteText = currentText.trim();
+    final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
     if (noteText.isEmpty) {
       stopEditing();
       return;
@@ -114,14 +116,16 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Call backend /predict endpoint, which also saves the note
+      // Use the currentDate you're on, NOT DateTime.now()
+
+
       final url = Uri.parse("http://127.0.0.1:8000/predict");
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: json.encode({
           "text": noteText,
-          "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          "date": formattedDate,
         }),
       );
 
@@ -133,11 +137,10 @@ class MyAppState extends ChangeNotifier {
           totals = {"Today's Total": data["Today's Total"]};
         }
 
-        // Refresh notes list from /expenses endpoint
-        final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
+        // Refresh notes for the currentDate (not today)
         await fetchNotes(date: formattedDate);
 
-        print("Saved successfully! Updated total: ${data["Today's Total"]}");
+        print("Saved successfully! Updated total: ${data["Today's Total"]} for date: $formattedDate");
       } else {
         print("Failed to save note: ${response.body}");
       }
@@ -285,40 +288,50 @@ class GeneratorPage extends StatefulWidget {
 }
 
 class _GeneratorPageState extends State<GeneratorPage> {
-  DateTime currentDate = DateTime.now();
-  void goToPreviousDay() {
-    setState(() {
-      currentDate = currentDate.subtract(Duration(days: 1));
-    });
 
-    print("Fetching notes for: $currentDate");
+  void goToPreviousDay() {
+    final appState = context.read<MyAppState>();
+    appState.setCurrentDate(appState.currentDate.subtract(const Duration(days: 1)));
     fetchNotesForCurrentDate();
   }
 
   void goToNextDay() {
-    setState(() {
-      currentDate = currentDate.add(Duration(days: 1));
-    });
+    final appState = context.read<MyAppState>();
+
+    // Only allow moving forward if the next day is today or earlier
+    final nextDay = appState.currentDate.add(const Duration(days: 1));
+    final today = DateTime.now();
+
+    // Compare only the date part, ignore hours/minutes
+    final nextDayDateOnly = DateTime(nextDay.year, nextDay.month, nextDay.day);
+    final todayDateOnly = DateTime(today.year, today.month, today.day);
+
+    if (nextDayDateOnly.isAfter(todayDateOnly)) {
+      // Do nothing if nextDay is in the future
+      return;
+    }
+
+    appState.setCurrentDate(nextDay);
     fetchNotesForCurrentDate();
-    print("Fetching notes for: $currentDate");
   }
 
   void fetchNotesForCurrentDate() {
-    print("Fetching notes for: $currentDate");
-    final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
+    final appState = context.read<MyAppState>();
+    print("Fetching notes for: ${appState.currentDate}");
+    final formattedDate = DateFormat('yyyy-MM-dd').format(appState.currentDate);
 
-    Provider.of<MyAppState>(context, listen: false).fetchNotes(date: formattedDate);
+    appState.fetchNotes(date: formattedDate);
   }
   @override
   void initState() {
     super.initState();
-    // Fetch date when the page loads
-    fetchNotesForCurrentDate();
-    // Fetch notes when the page loads
-    final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
-    Future.microtask(() =>
-        Provider.of<MyAppState>(context, listen: false).fetchNotes(date: formattedDate)
-    );
+
+    // Schedule fetch after widget is built so context is available
+    Future.microtask(() {
+      final appState = Provider.of<MyAppState>(context, listen: false);
+      final formattedDate = DateFormat('yyyy-MM-dd').format(appState.currentDate);
+      appState.fetchNotes(date: formattedDate);
+    });
   }
 
   @override
@@ -335,18 +348,30 @@ class _GeneratorPageState extends State<GeneratorPage> {
             child: Column(
               children: [
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_left),
-                        onPressed: goToPreviousDay,
-                      ),
-                      DateTimeDisplayWidget(),
-                      IconButton(
-                        icon: Icon(Icons.arrow_right),
-                        onPressed: goToNextDay,
-                      ),
-                    ]
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_left),
+                      onPressed: goToPreviousDay,
+                    ),
+                    DateTimeDisplayWidget(),
+                    Builder(
+                      builder: (context) {
+                        final appState = context.watch<MyAppState>();
+                        final nextDay = appState.currentDate.add(const Duration(days: 1));
+                        final today = DateTime.now();
+                        final nextDayDateOnly = DateTime(nextDay.year, nextDay.month, nextDay.day);
+                        final todayDateOnly = DateTime(today.year, today.month, today.day);
+
+                        final canGoNext = !nextDayDateOnly.isAfter(todayDateOnly);
+
+                        return IconButton(
+                          icon: Icon(Icons.arrow_right),
+                          onPressed: canGoNext ? goToNextDay : null, // disabled if cannot go next
+                        );
+                      },
+                    ),
+                  ],
                 ),
 
                 SizedBox(height: 20),
@@ -606,8 +631,11 @@ class _AnimatedNoteEditorState extends State<AnimatedNoteEditor> {
     );
   }
 }
+
+
 class DateTimeDisplayWidget extends StatefulWidget {
   const DateTimeDisplayWidget({Key? key}) : super(key: key);
+
   @override
   State<DateTimeDisplayWidget> createState() => _DateTimeDisplayWidgetState();
 }
@@ -619,7 +647,11 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize the formatted time once the widget is built
     _updateDateTime();
+
+    // Update every second
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() => _updateDateTime());
@@ -628,7 +660,8 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
   }
 
   void _updateDateTime() {
-    DateTime now = DateTime.now();
+    final appState = context.read<MyAppState>();
+    DateTime now = appState.currentDate;
 
     // Format weekday, day with suffix, and month
     String weekday = DateFormat('EEEE').format(now);
