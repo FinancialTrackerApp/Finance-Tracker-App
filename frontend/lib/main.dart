@@ -8,6 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 
+import 'package:table_calendar/table_calendar.dart';
+
+
 void main() {
   runApp(MyApp());
 }
@@ -371,6 +374,7 @@ class _GeneratorPageState extends State<GeneratorPage> {
                         );
                       },
                     ),
+                    DatePickerButton(),
                   ],
                 ),
 
@@ -703,6 +707,95 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
       style: GoogleFonts.lato(
         fontSize: 20,
         fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+}
+class DatePickerButton extends StatelessWidget {
+  const DatePickerButton({Key? key}) : super(key: key);
+
+  void _showCalendar(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: CalendarPopup(),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () => _showCalendar(context),
+      icon: Icon(Icons.calendar_today),
+      tooltip: 'Select Date', // optional, shows on long press for accessibility
+    );
+  }
+}
+
+class CalendarPopup extends StatefulWidget {
+  @override
+  _CalendarPopupState createState() => _CalendarPopupState();
+}
+
+class _CalendarPopupState extends State<CalendarPopup> {
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.read<MyAppState>();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TableCalendar(
+            firstDay: DateTime(2000),
+            lastDay: DateTime.now(),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            // 3. This callback will now work correctly
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+
+              // Update app state and fetch notes
+              appState.setCurrentDate(selectedDay);
+              final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+              appState.fetchNotes(date: formattedDate);
+
+              Navigator.of(context).pop(); // close the popup
+            },
+            calendarStyle: CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Colors.orange,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          SizedBox(height: 12),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("Cancel"),
+          ),
+        ],
       ),
     );
   }
