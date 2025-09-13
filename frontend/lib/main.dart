@@ -22,11 +22,12 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Finance Tracker App',
+        title: 'FinanceKoi',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
-        home: MyHomePage(),
+        home: SplashScreen(), // start with splash
+
       ),
     );
   }
@@ -217,16 +218,20 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
 
+
   @override
   Widget build(BuildContext context) {
     Widget page;
-    switch (selectedIndex) {
+    String appBarTitle; // Variable to hold the AppBar title
 
+    switch (selectedIndex) {
       case 0:
         page = GeneratorPage();
+        appBarTitle = "Expense Tracker"; // Title for Home page
         break;
       case 1:
-        page= GraphPage();
+        page = GraphPage();
+        appBarTitle = "Expenditure Graph"; // Title for Graph page
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -234,12 +239,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Expense Tracker",
+        title: Text(appBarTitle, // Use the dynamic title here
           style: GoogleFonts.lato(
             fontSize: 20,
           ),
         ),
-
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(Icons.menu), // hamburger menu
@@ -251,8 +255,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: [
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text("Home"),
+              leading: Icon(Icons.money),
+              title: Text("Expense Tracker",
+                  style: GoogleFonts.lato()
+              ),
               onTap: () {
                 setState(() {
                   selectedIndex = 0;
@@ -262,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: Icon(Icons.auto_graph),
-              title: Text("Expenditure Graph"),
+              title: Text("Expenditure Graph", style: GoogleFonts.lato()),
               onTap: () {
                 setState(() {
                   selectedIndex = 1;
@@ -800,5 +806,79 @@ class _CalendarPopupState extends State<CalendarPopup> {
     );
   }
 }
+class SplashScreen extends StatefulWidget {
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1), // Animation duration
+      vsync: this,
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _controller.forward(); // Start the animation
+
+    // Navigate after a longer delay
+    Future.delayed(Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => MyHomePage()),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Don't forget to dispose the controller
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Change this line from Colors.blue
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: Center(
+        child: FadeTransition(
+          opacity: _animation,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // To match the theme better, you might want the icon to use the primary color
+              Icon(
+                Icons.account_balance_wallet,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary, // Changed from Colors.white
+              ),
+              SizedBox(height: 16),
+              Text(
+                "FinanceKoi",
+                style: GoogleFonts.lato(
+                  fontSize: 28,
+                  // And the text to use a color that's readable on the new background
+                  color: Theme.of(context).colorScheme.onPrimaryContainer, // Changed from Colors.white
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
