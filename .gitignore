@@ -19,3 +19,5 @@ tempCodeRunnerFile.py
 /shelf/
 /workspace.xml
 
+backend/data/*.db
+
