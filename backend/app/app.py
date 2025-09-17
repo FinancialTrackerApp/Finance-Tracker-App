@@ -4,9 +4,10 @@ from pydantic import BaseModel
 import torch
 import torch.nn as nn
 import joblib
+import sqlite3
 import os
 import re
-from ..add_to_db import add_entry, get_total_by_date
+from ..add_to_db import add_entry, get_total_by_date,delete_entry_by_id
 from torch.nn import functional as F
 
 # Configure logger
@@ -16,7 +17,10 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
+#DB path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "..", "data")
+DB_NAME = os.path.join(DATA_DIR, "expenses.db")
 
 # -------------------
 # Define model
@@ -108,4 +112,42 @@ async def predict_expense(req: ExpenseRequest):
 
     total_amount = get_total_by_date(req.date)
     logger.info(f"Total for {req.date}: {total_amount}")
-    return {"total_amount": total_amount}
+    return {"Today's Total": total_amount}
+@app.delete("/expenses/{entry_id}")
+def delete_expense(entry_id: int):
+    # First, get the date of the expense before deleting
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT date FROM expenses WHERE id = ?", (entry_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail=f"No expense found with ID {entry_id}")
+    expense_date = row[0]
+    # Delete the expense
+    delete_entry_by_id(entry_id)
+
+    # Get the updated total for that date
+    updated_total = get_total_by_date(expense_date)
+
+    return {
+        "message": f"Expense with ID {entry_id} deleted successfully",
+        "date": expense_date,
+        "updated_total": updated_total
+    }
+@app.get("/expenses")
+def get_all_expenses(date: str = None):
+    
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    if date:
+        cursor.execute("SELECT id, text, category, amount FROM expenses WHERE TRIM(date) = ?", (date,))
+    else:
+        cursor.execute("SELECT id, text, category, amount FROM expenses")
+    rows = cursor.fetchall()
+    print("Querying for date:", date)
+    print("Rows fetched from DB:", rows)
+    
+    conn.close()
+ 
+    return [{"id": row[0], "text": row[1]} for row in rows]

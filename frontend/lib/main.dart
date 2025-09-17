@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
+
+import 'package:table_calendar/table_calendar.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -18,11 +22,12 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Finance Tracker App',
+        title: 'FinanceKoi',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
-        home: MyHomePage(),
+        home: SplashScreen(), // start with splash
+
       ),
     );
   }
@@ -30,8 +35,10 @@ class MyApp extends StatelessWidget {
 
 // App state
 class Note {
-  String text;
-  Note({required this.text});
+  final int id;
+  final String text;
+
+  Note({required this.id, required this.text});
 }
 
 class MyAppState extends ChangeNotifier {
@@ -42,46 +49,52 @@ class MyAppState extends ChangeNotifier {
   List<Note> notes = [];
   bool isEditing = false;
   String currentText = "";
+  DateTime currentDate = DateTime.now();
+
+  void setCurrentDate(DateTime newDate) {
+    currentDate = newDate;
+    notifyListeners();
+  }
 
   void updateInput(String newText) {
     userInput = newText;
     notifyListeners();
   }
 
-  Future<void> predict([String? text]) async {
-    final input = text ?? userInput; // Use provided text OR fallback to userInput
-    if (input.isEmpty) return;
-
-    isLoading = true;
-    notifyListeners();
-
-    try {
-      // Use current date in ISO format
-      final noww = DateTime.now();
-      final now = DateFormat('dd-MM-yyyy').format(noww);
-
-      final url = Uri.parse("http://127.0.0.1:8000/predict"); // adjust if using physical device
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "text": input,
-          "date": now, // <-- send the date field
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        totals = json.decode(response.body); // update totals box
-      } else {
-        print("Error: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Exception: $e");
-    }
-
-    isLoading = false;
-    notifyListeners();
-  }
+  // Future<void> predict([String? text]) async {
+  //   final input = text ?? userInput; // Use provided text OR fallback to userInput
+  //   if (input.isEmpty) return;
+  //
+  //   isLoading = true;
+  //   notifyListeners();
+  //
+  //   try {
+  //     // Use current date in ISO format
+  //     final noww = DateTime.now();
+  //     final now = DateFormat('dd-MM-yyyy').format(noww);
+  //
+  //     final url = Uri.parse("http://127.0.0.1:8000/predict"); // adjust if using physical device
+  //     final response = await http.post(
+  //       url,
+  //       headers: {"Content-Type": "application/json"},
+  //       body: json.encode({
+  //         "text": input,
+  //         "date": now, // <-- send the date field
+  //       }),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       totals = json.decode(response.body); // update totals box
+  //     } else {
+  //       print("Error: ${response.statusCode}");
+  //     }
+  //   } catch (e) {
+  //     print("Exception: $e");
+  //   }
+  //
+  //   isLoading = false;
+  //   notifyListeners();
+  // }
 
   // Notes logic
   void startEditing({String text = "", int? index}) {
@@ -95,39 +108,104 @@ class MyAppState extends ChangeNotifier {
     currentText = "";
     notifyListeners();
   }
-  void saveNote() {
+  Future<void> saveNote() async {
     final noteText = currentText.trim();
-
+    final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
     if (noteText.isEmpty) {
       stopEditing();
       return;
     }
 
-    // Save or update note
-    if (editingIndex != null) {
-      notes[editingIndex!] = Note(text: noteText);
-    } else {
-      notes.add(Note(text: noteText));
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      // Use the currentDate you're on, NOT DateTime.now()
+
+
+      final url = Uri.parse("http://127.0.0.1:8000/predict");
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "text": noteText,
+          "date": formattedDate,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Update totals immediately from backend
+        if (data["Today's Total"] != null) {
+          totals = {"Today's Total": data["Today's Total"]};
+        }
+
+        // Refresh notes for the currentDate (not today)
+        await fetchNotes(date: formattedDate);
+
+        print("Saved successfully! Updated total: ${data["Today's Total"]} for date: $formattedDate");
+      } else {
+        print("Failed to save note: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception while saving note: $e");
     }
 
-    // Call predict() with the saved note's text
-    predict(noteText);
-
+    isLoading = false;
     stopEditing();
+    notifyListeners();
   }
-
   void updateText(String text) {
     currentText = text;
     notifyListeners();
   }
 
-  void addNote(String text) {
-    notes.add(Note(text: text));
-    notifyListeners();
+
+  Future<void> fetchNotes({required String date}) async {
+
+    final url = Uri.parse("http://127.0.0.1:8000/expenses?date=$date");
+    final response = await http.get(url);
+    print("$date");
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      notes = data.map<Note>((item) {
+        return Note(id: item['id'], text: item['text']);
+      }).toList();
+      notifyListeners();
+    } else {
+      print("Failed to fetch notes: ${response.body}");
+    }
   }
-  void deleteNoteAt(int index) {
-    notes.removeAt(index);
-    notifyListeners();
+  Future<void> deleteNoteAt(int index) async {
+    final appState = this; // assuming this is inside MyAppState
+    final expenseId = notes[index].id;
+    final url = Uri.parse('http://127.0.0.1:8000/expenses/$expenseId');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Refresh notes list
+        final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
+
+        await fetchNotes(date: formattedDate);
+
+        // Update totals using the backend's updated_total
+        if (data['updated_total'] != null) {
+          appState.totals = {"Today's Total": data['updated_total']};
+        }
+
+        notifyListeners();
+        print("Deleted successfully! Updated total: ${data['updated_total']}");
+      } else {
+        print("Failed to delete note: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception while deleting note: $e");
+    }
   }
 }
 
@@ -140,16 +218,20 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
 
+
   @override
   Widget build(BuildContext context) {
     Widget page;
+    String appBarTitle; // Variable to hold the AppBar title
+
     switch (selectedIndex) {
-      
       case 0:
         page = GeneratorPage();
+        appBarTitle = "Expense Tracker"; // Title for Home page
         break;
       case 1:
-        page= GraphPage();
+        page = GraphPage();
+        appBarTitle = "Expenditure Graph"; // Title for Graph page
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -157,12 +239,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Expense Tracker",
+        title: Text(appBarTitle, // Use the dynamic title here
           style: GoogleFonts.lato(
             fontSize: 20,
           ),
         ),
-
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(Icons.menu), // hamburger menu
@@ -174,8 +255,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: [
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text("Home"),
+              leading: Icon(Icons.money),
+              title: Text("Expense Tracker",
+                  style: GoogleFonts.lato()
+              ),
               onTap: () {
                 setState(() {
                   selectedIndex = 0;
@@ -185,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: Icon(Icons.auto_graph),
-              title: Text("Expenditure Graph"),
+              title: Text("Expenditure Graph", style: GoogleFonts.lato()),
               onTap: () {
                 setState(() {
                   selectedIndex = 1;
@@ -206,7 +289,60 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 // Generator page with input, buttons, totals, and notes
-class GeneratorPage extends StatelessWidget {
+class GeneratorPage extends StatefulWidget {
+  @override
+
+  State<GeneratorPage> createState() => _GeneratorPageState();
+
+}
+
+class _GeneratorPageState extends State<GeneratorPage> {
+
+  void goToPreviousDay() {
+    final appState = context.read<MyAppState>();
+    appState.setCurrentDate(appState.currentDate.subtract(const Duration(days: 1)));
+    fetchNotesForCurrentDate();
+  }
+
+  void goToNextDay() {
+    final appState = context.read<MyAppState>();
+
+    // Only allow moving forward if the next day is today or earlier
+    final nextDay = appState.currentDate.add(const Duration(days: 1));
+    final today = DateTime.now();
+
+    // Compare only the date part, ignore hours/minutes
+    final nextDayDateOnly = DateTime(nextDay.year, nextDay.month, nextDay.day);
+    final todayDateOnly = DateTime(today.year, today.month, today.day);
+
+    if (nextDayDateOnly.isAfter(todayDateOnly)) {
+      // Do nothing if nextDay is in the future
+      return;
+    }
+
+    appState.setCurrentDate(nextDay);
+    fetchNotesForCurrentDate();
+  }
+
+  void fetchNotesForCurrentDate() {
+    final appState = context.read<MyAppState>();
+    print("Fetching notes for: ${appState.currentDate}");
+    final formattedDate = DateFormat('yyyy-MM-dd').format(appState.currentDate);
+
+    appState.fetchNotes(date: formattedDate);
+  }
+  @override
+  void initState() {
+    super.initState();
+
+    // Schedule fetch after widget is built so context is available
+    Future.microtask(() {
+      final appState = Provider.of<MyAppState>(context, listen: false);
+      final formattedDate = DateFormat('yyyy-MM-dd').format(appState.currentDate);
+      appState.fetchNotes(date: formattedDate);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
@@ -220,7 +356,34 @@ class GeneratorPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                DateTimeDisplayWidget(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_left),
+                      onPressed: goToPreviousDay,
+                    ),
+                    DateTimeDisplayWidget(),
+                    Builder(
+                      builder: (context) {
+                        final appState = context.watch<MyAppState>();
+                        final nextDay = appState.currentDate.add(const Duration(days: 1));
+                        final today = DateTime.now();
+                        final nextDayDateOnly = DateTime(nextDay.year, nextDay.month, nextDay.day);
+                        final todayDateOnly = DateTime(today.year, today.month, today.day);
+
+                        final canGoNext = !nextDayDateOnly.isAfter(todayDateOnly);
+
+                        return IconButton(
+                          icon: Icon(Icons.arrow_right),
+                          onPressed: canGoNext ? goToNextDay : null, // disabled if cannot go next
+                        );
+                      },
+                    ),
+                    DatePickerButton(),
+                  ],
+                ),
+
                 SizedBox(height: 20),
 
                 // Totals box
@@ -251,6 +414,7 @@ class GeneratorPage extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 // Notes list
+
                 Expanded(
                   child: ListView(
                     children: appState.notes
@@ -323,55 +487,55 @@ class GraphPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: LineChart(
-          LineChartData(
-            lineBarsData: [
-              LineChartBarData(
-                spots: monthlyData.asMap().entries.map((entry) {
-                  final idx = entry.key;
-                  final data = entry.value;
-                  return FlSpot(idx.toDouble(), data['total'].toDouble());
-                }).toList(),
-                isCurved: true,
-                barWidth: 3,
-                dotData: FlDotData(show: true),
-                color: Colors.blue,
-              ),
-            ],
-            titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final idx = value.toInt();
-                    if (idx < 0 || idx >= monthlyData.length) return Container();
-                    return Text(monthlyData[idx]['month']);
-                  },
-                  reservedSize: 30,
+          padding: const EdgeInsets.all(16),
+          child: LineChart(
+            LineChartData(
+              lineBarsData: [
+                LineChartBarData(
+                  spots: monthlyData.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final data = entry.value;
+                    return FlSpot(idx.toDouble(), data['total'].toDouble());
+                  }).toList(),
+                  isCurved: true,
+                  barWidth: 3,
+                  dotData: FlDotData(show: true),
+                  color: Colors.blue,
+                ),
+              ],
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      final idx = value.toInt();
+                      if (idx < 0 || idx >= monthlyData.length) return Container();
+                      return Text(monthlyData[idx]['month']);
+                    },
+                    reservedSize: 30,
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: true, reservedSize: 40),
                 ),
               ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+              gridData: FlGridData(show: true),
+              lineTouchData: LineTouchData(
+                enabled: true,
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipItems: (touchedSpots) {
+                    return touchedSpots.map((spot) {
+                      final idx = spot.spotIndex;
+                      return LineTooltipItem(
+                        "${monthlyData[idx]['month']}\n₹${spot.y.toStringAsFixed(0)}",
+                        const TextStyle(color: Colors.white),
+                      );
+                    }).toList();
+                  },
+                ),
               ),
             ),
-            gridData: FlGridData(show: true),
-            lineTouchData: LineTouchData(
-              enabled: true,
-              touchTooltipData: LineTouchTooltipData(
-                getTooltipItems: (touchedSpots) {
-                  return touchedSpots.map((spot) {
-                    final idx = spot.spotIndex;
-                    return LineTooltipItem(
-                      "${monthlyData[idx]['month']}\n₹${spot.y.toStringAsFixed(0)}",
-                      const TextStyle(color: Colors.white),
-                    );
-                  }).toList();
-                },
-              ),
-            ),
-          ),
-        )
+          )
       ),
     );
   }
@@ -477,8 +641,11 @@ class _AnimatedNoteEditorState extends State<AnimatedNoteEditor> {
     );
   }
 }
+
+
 class DateTimeDisplayWidget extends StatefulWidget {
   const DateTimeDisplayWidget({Key? key}) : super(key: key);
+
   @override
   State<DateTimeDisplayWidget> createState() => _DateTimeDisplayWidgetState();
 }
@@ -490,7 +657,11 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize the formatted time once the widget is built
     _updateDateTime();
+
+    // Update every second
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() => _updateDateTime());
@@ -499,7 +670,8 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
   }
 
   void _updateDateTime() {
-    DateTime now = DateTime.now();
+    final appState = context.read<MyAppState>();
+    DateTime now = appState.currentDate;
 
     // Format weekday, day with suffix, and month
     String weekday = DateFormat('EEEE').format(now);
@@ -545,5 +717,168 @@ class _DateTimeDisplayWidgetState extends State<DateTimeDisplayWidget> {
     );
   }
 }
+class DatePickerButton extends StatelessWidget {
+  const DatePickerButton({Key? key}) : super(key: key);
 
+  void _showCalendar(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: CalendarPopup(),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () => _showCalendar(context),
+      icon: Icon(Icons.calendar_today),
+      tooltip: 'Select Date', // optional, shows on long press for accessibility
+    );
+  }
+}
+
+class CalendarPopup extends StatefulWidget {
+  @override
+  _CalendarPopupState createState() => _CalendarPopupState();
+}
+
+class _CalendarPopupState extends State<CalendarPopup> {
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.read<MyAppState>();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TableCalendar(
+            firstDay: DateTime(2000),
+            lastDay: DateTime.now(),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            // 3. This callback will now work correctly
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+
+              // Update app state and fetch notes
+              appState.setCurrentDate(selectedDay);
+              final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+              appState.fetchNotes(date: formattedDate);
+
+              Navigator.of(context).pop(); // close the popup
+            },
+            calendarStyle: CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Colors.orange,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          SizedBox(height: 12),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("Cancel"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class SplashScreen extends StatefulWidget {
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1), // Animation duration
+      vsync: this,
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _controller.forward(); // Start the animation
+
+    // Navigate after a longer delay
+    Future.delayed(Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => MyHomePage()),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Don't forget to dispose the controller
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Change this line from Colors.blue
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: Center(
+        child: FadeTransition(
+          opacity: _animation,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // To match the theme better, you might want the icon to use the primary color
+              Icon(
+                Icons.account_balance_wallet,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary, // Changed from Colors.white
+              ),
+              SizedBox(height: 16),
+              Text(
+                "FinanceKoi",
+                style: GoogleFonts.lato(
+                  fontSize: 28,
+                  // And the text to use a color that's readable on the new background
+                  color: Theme.of(context).colorScheme.onPrimaryContainer, // Changed from Colors.white
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
