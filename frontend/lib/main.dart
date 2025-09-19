@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
-
 import 'package:table_calendar/table_calendar.dart';
 
 
@@ -207,6 +206,8 @@ class MyAppState extends ChangeNotifier {
       print("Exception while deleting note: $e");
     }
   }
+
+  void uploadFile() {}
 }
 
 // Main page with NavigationRail
@@ -463,79 +464,163 @@ class _GeneratorPageState extends State<GeneratorPage> {
           if (appState.isEditing) AnimatedNoteEditor(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => appState.startEditing(),
-        child: const Icon(Icons.edit, color: Colors.white),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end, // Aligns buttons to the end of the Row
+        children: <Widget>[
+          FloatingActionButton(
+            onPressed: () {
+              appState.uploadFile();
+              print("File upload pressed");
+            },
+            heroTag: null, // Add unique heroTag or set to null if not animating between screens
+            child: const Icon(Icons.upload_file, color: Colors.white),
+            tooltip: 'Upload File',
+          ),
+          SizedBox(width: 10), // Spacing between the buttons
+          FloatingActionButton(
+            onPressed: () => appState.startEditing(),
+            heroTag: null, // Add unique heroTag or set to null
+            child: const Icon(Icons.edit, color: Colors.white),
+            tooltip: 'Edit Note',
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
-class GraphPage extends StatelessWidget {
-  final List<Map<String, dynamic>> monthlyData = [
-    {"month": "Jan", "total": 5000},
-    {"month": "Feb", "total": 6000},
-    {"month": "Mar", "total": 5500},
-    {"month": "Apr", "total": 7000},
-    {"month": "May", "total": 6500},
-    {"month": "Jun", "total": 7200},
+Future<List<Map<String, dynamic>>> fetchDailyData() async {
+  final response = await http.get(Uri.parse("http://127.0.0.1:8000/stats/daily"));
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((entry) {
+      final date = entry['date'] as String;
+      final total = (entry['total'] as num).toDouble();
 
+      // Format label for x-axis
+      final dateObj = DateTime.parse(date);
+      final label = "${_monthShort(dateObj.month)} ${dateObj.day}";
+
+      return {"date": date, "label": label, "total": total};
+    }).toList();
+  } else {
+    throw Exception("Failed to load daily stats");
+  }
+}
+
+String _monthShort(int month) {
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
   ];
+  return months[month - 1];
+}
+
+// Fetch category breakdown for a date
+Future<Map<String, double>> fetchCategoryBreakdown(String date) async {
+  final response = await http.get(Uri.parse("http://127.0.0.1:8000/stats/day/$date"));
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> data = json.decode(response.body);
+    return data.map((key, value) => MapEntry(key, (value as num).toDouble()));
+  } else {
+    throw Exception("Failed to load category stats");
+  }
+}
+class GraphPage extends StatelessWidget {
+  const GraphPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: LineChart(
-            LineChartData(
-              lineBarsData: [
-                LineChartBarData(
-                  spots: monthlyData.asMap().entries.map((entry) {
-                    final idx = entry.key;
-                    final data = entry.value;
-                    return FlSpot(idx.toDouble(), data['total'].toDouble());
-                  }).toList(),
-                  isCurved: true,
-                  barWidth: 3,
-                  dotData: FlDotData(show: true),
-                  color: Colors.blue,
-                ),
-              ],
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      final idx = value.toInt();
-                      if (idx < 0 || idx >= monthlyData.length) return Container();
-                      return Text(monthlyData[idx]['month']);
+        padding: const EdgeInsets.all(16),
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: fetchDailyData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else {
+              final dailyData = snapshot.data!;
+              return LineChart(
+                LineChartData(
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: dailyData.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final data = entry.value;
+                        return FlSpot(idx.toDouble(), data['total'].toDouble());
+                      }).toList(),
+                      isCurved: true,
+                      barWidth: 3,
+                      dotData: FlDotData(show: true),
+                      color: Colors.blue,
+                    ),
+                  ],
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final idx = value.toInt();
+                          if (idx < 0 || idx >= dailyData.length) return Container();
+                          return Text(dailyData[idx]['label']);
+                        },
+                        reservedSize: 30,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+                    ),
+                  ),
+                  gridData: FlGridData(show: true),
+                  lineTouchData: LineTouchData(
+                    enabled: true,
+                    touchTooltipData: LineTouchTooltipData(
+                      getTooltipItems: (touchedSpots) {
+                        return touchedSpots.map((spot) {
+                          final idx = spot.spotIndex;
+                          return LineTooltipItem(
+                            "${dailyData[idx]['label']}\n₹${spot.y.toStringAsFixed(0)}",
+                            const TextStyle(color: Colors.white),
+                          );
+                        }).toList();
+                      },
+                    ),
+                    touchCallback: (FlTouchEvent event, LineTouchResponse? response) async {
+                      // ✅ Only react to tap-up (click), ignore hovers/drags
+                      if (event is! FlTapUpEvent) return;
+                      if (response == null) return;
+
+                      final spot = response.lineBarSpots?.first;
+                      if (spot != null) {
+                        final idx = spot.x.toInt();
+                        if (idx >= 0 && idx < dailyData.length) {
+                          final date = dailyData[idx]['date'];
+                          final breakdown = await fetchCategoryBreakdown(date);
+
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (_) => ListView(
+                              children: breakdown.entries.map((e) {
+                                return ListTile(
+                                  title: Text(e.key),
+                                  trailing: Text("₹${e.value.toStringAsFixed(0)}"),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        }
+                      }
                     },
-                    reservedSize: 30,
                   ),
                 ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: true, reservedSize: 40),
-                ),
-              ),
-              gridData: FlGridData(show: true),
-              lineTouchData: LineTouchData(
-                enabled: true,
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipItems: (touchedSpots) {
-                    return touchedSpots.map((spot) {
-                      final idx = spot.spotIndex;
-                      return LineTooltipItem(
-                        "${monthlyData[idx]['month']}\n₹${spot.y.toStringAsFixed(0)}",
-                        const TextStyle(color: Colors.white),
-                      );
-                    }).toList();
-                  },
-                ),
-              ),
-            ),
-          )
+              );
+            }
+          },
+        ),
       ),
     );
   }

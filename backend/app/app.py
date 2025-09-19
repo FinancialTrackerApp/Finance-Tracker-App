@@ -9,6 +9,7 @@ import os
 import re
 from ..add_to_db import add_entry, get_total_by_date,delete_entry_by_id
 from torch.nn import functional as F
+from ..add_to_db import get_category_dict
 
 # Configure logger
 logging.basicConfig(
@@ -151,3 +152,17 @@ def get_all_expenses(date: str = None):
     conn.close()
  
     return [{"id": row[0], "text": row[1]} for row in rows]
+@app.get("/stats/day/{date}")
+def get_stats_for_day(date: str):
+    try:
+        return get_category_dict(date)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/stats/daily")
+def get_daily_totals():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT date, SUM(amount) FROM expenses GROUP BY date ORDER BY date")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"date": row[0], "total": row[1]} for row in rows]
