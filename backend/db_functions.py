@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import datetime
 
 # How expenses.db will look like:
 
@@ -138,6 +139,66 @@ def clear_db():
     conn.close()
     print("Database cleared.")
 
+def get_last_3_months_expenses(input_month):
+    """
+    Given an input month 'YYYY-MM', return a list of lists,
+    each containing the total amount spent in each category for each of the previous 3 months (excluding the input month).
+    The order of categories is: ['Education', 'Food', 'Healthcare', 'Housing', 'Others', 'Transport']
+    If there is no data for a category, it is zero.
+    If there is not enough data for 3 months:
+      - If no months: return 3 lists of zeros.
+      - If 1 month: repeat it 3 times.
+      - If 2 months: fill the missing with the nearest available month.
+    """
+    year, month = map(int, input_month.split('-'))
+    base_date = datetime.date(year, month, 1)
+    months = []
+    for _ in range(3):
+        prev_month = base_date - datetime.timedelta(days=1)
+        prev_month = prev_month.replace(day=1)
+        months.append(prev_month.strftime('%Y-%m'))
+        base_date = prev_month
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    month_data = []
+    for m in months:
+        category_totals = {cat: 0.0 for cat in CATEGORIES}
+        cursor.execute("""
+            SELECT category, SUM(amount) FROM expenses
+            WHERE substr(date, 1, 7) = ?
+            GROUP BY category
+        """, (m,))
+        rows = cursor.fetchall()
+        for cat, amt in rows:
+            if cat in category_totals and amt is not None:
+                category_totals[cat] = amt
+        month_data.append([category_totals[cat] for cat in CATEGORIES])
+    conn.close()
+
+    # Check for available data
+    nonzero = [d for d in month_data if any(x != 0.0 for x in d)]
+    if len(nonzero) == 0:
+        return [[0.0]*len(CATEGORIES) for _ in range(3)]
+    elif len(nonzero) == 1:
+        return [nonzero[0]]*3
+    elif len(nonzero) == 2:
+        # Fill missing with nearest (repeat first or last)
+        filled = []
+        idx = 0
+        for d in month_data:
+            if any(x != 0.0 for x in d):
+                filled.append(d)
+                idx += 1
+            else:
+                # Use previous if possible, else next
+                if idx == 0:
+                    filled.append(nonzero[0])
+                else:
+                    filled.append(nonzero[1])
+        return filled
+    else:
+        return month_data
 # -------------------
 # Example usage
 # -------------------

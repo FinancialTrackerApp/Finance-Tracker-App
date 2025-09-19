@@ -7,9 +7,8 @@ import joblib
 import sqlite3
 import os
 import re
-from ..add_to_db import add_entry, get_total_by_date,delete_entry_by_id
+from ..db_functions import *
 from torch.nn import functional as F
-from ..add_to_db import get_category_dict
 
 # Configure logger
 logging.basicConfig(
@@ -93,7 +92,6 @@ def predict_category_and_amount(text: str, threshold: float = 0.6):
         pred_category = CATEGORY_MAPPING[pred_idx.item()]
     logger.info(f"Predicted: {pred_category} with prob {max_prob.item():.4f}")
     return pred_category, extract_amount(text)
-
 # -------------------
 # FastAPI route
 # -------------------
@@ -114,6 +112,7 @@ async def predict_expense(req: ExpenseRequest):
     total_amount = get_total_by_date(req.date)
     logger.info(f"Total for {req.date}: {total_amount}")
     return {"Today's Total": total_amount}
+
 @app.delete("/expenses/{entry_id}")
 def delete_expense(entry_id: int):
     # First, get the date of the expense before deleting
@@ -152,6 +151,15 @@ def get_all_expenses(date: str = None):
     conn.close()
  
     return [{"id": row[0], "text": row[1]} for row in rows]
+
+@app.get("predict/expense")
+def predicted_expense(date: str): #YYYY-MM format
+    if not date:
+        raise HTTPException(status_code=400, detail="No date provided")
+    last_3_month_expenses = get_last_3_months_expenses(date)
+    if(sum(sum(row) for row in L)==0):
+        raise HTTPException(status_code=404, detail="No expense data for the last 3 months")
+
 @app.get("/stats/day/{date}")
 def get_stats_for_day(date: str):
     try:
