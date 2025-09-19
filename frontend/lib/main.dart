@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -102,11 +104,13 @@ class MyAppState extends ChangeNotifier {
     editingIndex = index; // track which note is being edited
     notifyListeners();
   }
+
   void stopEditing() {
     isEditing = false;
     currentText = "";
     notifyListeners();
   }
+
   Future<void> saveNote() async {
     final noteText = currentText.trim();
     final formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
@@ -143,7 +147,8 @@ class MyAppState extends ChangeNotifier {
         // Refresh notes for the currentDate (not today)
         await fetchNotes(date: formattedDate);
 
-        print("Saved successfully! Updated total: ${data["Today's Total"]} for date: $formattedDate");
+        print(
+            "Saved successfully! Updated total: ${data["Today's Total"]} for date: $formattedDate");
       } else {
         print("Failed to save note: ${response.body}");
       }
@@ -155,6 +160,7 @@ class MyAppState extends ChangeNotifier {
     stopEditing();
     notifyListeners();
   }
+
   void updateText(String text) {
     currentText = text;
     notifyListeners();
@@ -162,7 +168,6 @@ class MyAppState extends ChangeNotifier {
 
 
   Future<void> fetchNotes({required String date}) async {
-
     final url = Uri.parse("http://127.0.0.1:8000/expenses?date=$date");
     final response = await http.get(url);
     print("$date");
@@ -176,6 +181,7 @@ class MyAppState extends ChangeNotifier {
       print("Failed to fetch notes: ${response.body}");
     }
   }
+
   Future<void> deleteNoteAt(int index) async {
     final appState = this; // assuming this is inside MyAppState
     final expenseId = notes[index].id;
@@ -207,9 +213,53 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
-  void uploadFile() {}
-}
+  void parseReceipt(List<int> fileBytes) {
+    // Placeholder: later we can use tesseract_ocr or backend service
+    print("Parsing receipt of ${fileBytes.length} bytes...");
 
+    // Example dummy data returned
+    Map<String, dynamic> parsedData = {
+      "date": "2025-09-19",
+      "items": [
+        {"name": "Milk", "amount": 50.0},
+        {"name": "Bread", "amount": 30.0},
+      ],
+      "total": 80.0,
+    };
+
+    print(parsedData);
+  }
+
+  Future<void> uploadFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'png','jpeg'],
+    );
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+
+      // Send to backend
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://127.0.0.1:8000/parse_receipt'),
+      );
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        String respStr = await response.stream.bytesToString();
+        var jsonData = json.decode(respStr);
+        print("Parsed receipt data: $jsonData");
+      } else {
+        print("Failed to parse receipt. Status: ${response.statusCode}");
+      }
+    } else {
+      print("No file selected");
+    }
+  }
+}
 // Main page with NavigationRail
 class MyHomePage extends StatefulWidget {
   @override
