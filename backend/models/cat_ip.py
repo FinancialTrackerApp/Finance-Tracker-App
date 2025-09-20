@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[839]:
 
 
 import torch
@@ -12,9 +12,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import os
+import re
 
 
-# In[2]:
+# In[840]:
+
+
+import torch
+print(torch.__version__)
+print(torch.cuda.is_available())
+
+
+# In[841]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -23,7 +32,35 @@ device
 
 
 
-# In[ ]:
+# In[842]:
+
+
+import re
+
+def normalize_text(text: str) -> str:
+    # Convert to lowercase
+    text = text.lower()
+
+    # Replace dates (dd/mm/yyyy or yyyy-mm-dd) with <DATE>
+    text = re.sub(r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b', '<DATE>', text)
+    text = re.sub(r'\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b', '<DATE>', text)
+
+    # Replace currency amounts ($, €, ₹, £, etc.) with <CUR>
+    text = re.sub(r'[\$€₹£]\s*\d+(\.\d+)?', '<CUR>', text)
+
+    # Replace all standalone numbers with <NUM>
+    text = re.sub(r'\b\d+(\.\d+)?\b', '<NUM>', text)
+
+    # Remove punctuation
+    text = re.sub(r'[^\w\s<>]', '', text)
+
+    # Remove extra whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+
+    return text
+
+
+# In[843]:
 
 
 # Get current working directory (where Jupyter is running)
@@ -39,11 +76,12 @@ print("CSV Path:", csv_path)
 
 df = pd.read_csv(csv_path)
 # Extract columns
+df["text"] = df["text"].apply(normalize_text)
 texts = df['text']
 labels = df['category']
 
 
-# In[4]:
+# In[844]:
 
 
 #converting text data into numerical vectors
@@ -52,7 +90,7 @@ X = vectorizer.fit_transform(texts)
 X.shape
 
 
-# In[5]:
+# In[845]:
 
 
 # Encoding the labels
@@ -61,7 +99,7 @@ y = encoder.fit_transform(labels)
 y
 
 
-# In[6]:
+# In[846]:
 
 
 #Train and test split
@@ -78,7 +116,7 @@ X_test = torch.tensor(X_test, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.long)
 
 
-# In[7]:
+# In[847]:
 
 
 X_train = X_train.to(device)
@@ -87,7 +125,7 @@ X_test = X_test.to(device)
 y_test = y_test.to(device)
 
 
-# In[8]:
+# In[848]:
 
 
 #Define model
@@ -105,13 +143,13 @@ class ExpenseClassifier(nn.Module):
         return out
 
 
-# In[9]:
+# In[849]:
 
 
 X_train.shape[1]
 
 
-# In[10]:
+# In[850]:
 
 
 input_size = X_train.shape[1]
@@ -122,7 +160,7 @@ model = ExpenseClassifier(input_size, hidden_size, num_classes)
 model.to(device)
 
 
-# In[11]:
+# In[851]:
 
 
 #Loss and optimizer
@@ -130,7 +168,7 @@ criterion = nn.CrossEntropyLoss() # compares predicted catgeory vs actual
 optimizer = optim.Adam(model.parameters(), lr=0.01) # updates model weights efficiently
 
 
-# In[12]:
+# In[852]:
 
 
 #Training loop
@@ -146,7 +184,7 @@ for epoch in range(epochs):
         print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
 
 
-# In[13]:
+# In[853]:
 
 
 #Evaluation
@@ -157,7 +195,7 @@ with torch.inference_mode():
     print(f'Accuracy: {acc.item():.4f}')
 
 
-# In[14]:
+# In[854]:
 
 
 import torch
@@ -178,67 +216,72 @@ category_list = list(encoder.classes_)  # this preserves exact order
 torch.save(category_list, os.path.join(save_dir, "encoder.pth"))
 
 
-# In[15]:
+# In[855]:
 
 
-import spacy
-nlp = spacy.load("en_core_web_sm")
-totals = {
-    "Transport": 0.0,
-    "Healthcare": 0.0,
-    "Food": 0.0,
-    "Housing": 0.0,
-    "Education": 0.0,
-    "Others": 0.0
-}
+# import spacy
+# nlp = spacy.load("en_core_web_sm")
+totals = {category: 0.0 for category in encoder.classes_}
+totals["Others"] = 0.0
 
-def predict(text):
-    # Vectorize and move to correct device
+import torch.nn.functional as F
+
+def predict(text, threshold=0.7):
+    # Vectorize
+    text = normalize_text(text)
     vec = vectorizer.transform([text]).toarray()
     vec = torch.tensor(vec, dtype=torch.float32).to(device)
 
-    # Predict category
+    # Predict probabilities
     output = model(vec)
-    pred = torch.argmax(output, 1).item()
-    pred = encoder.inverse_transform([pred])[0]
+    probs = F.softmax(output, dim=1)
+    max_prob, pred_idx = torch.max(probs, dim=1)
 
-    # Extract all amounts
-    doc = nlp(text)
-    amount = 0.0
-    for ent in doc.ents:
-        if ent.label_ in ["MONEY", "CARDINAL"]:
-            try:
-                amount += float(ent.text)  # sum all numbers in the sentence
-            except:
-                pass
+    # Decide category
+    if max_prob.item() < threshold:
+        pred_category = "Others"
+    else:
+        pred_category = encoder.inverse_transform([pred_idx.item()])[0]
+    print(f"Predicted category: {pred_category} with probability {max_prob.item():.4f}")
+    return pred_category
 
-    totals[pred] += amount
+
+    # # Extract all amounts
+    # doc = nlp(text)
+    # amount = 0.0
+    # for ent in doc.ents:
+    #     if ent.label_ in ["MONEY", "CARDINAL"]:
+    #         try:
+    #             amount += float(ent.text)  # sum all numbers in the sentence
+    #         except:
+    #             pass
+
+    # totals[pred] += amount
     # return totals
 # testing:
-# predict("Bought apples for 80 rs")   
-# predict("Hospital bill as 750")   
-# predict("Taxi fare as 300")       
-# predict("Netflix subscription as 500") 
-# predict("Train from Velachery as 150") 
-# predict("Spent 500 for spinach")
-# predict("Spent 500000 on sons tuition fee")
-predict("Medical fee 500")
-
-print(totals)
-
-
-# In[16]:
+predict("Bought apples for 80 rs")   
+predict("Hospital bill as 750")   
+predict("Taxi fare as 300")       
+predict("Netflix subscription as 500") 
+predict("Train from Velachery as 150") 
+predict("Spent 500 for spinach")
+predict("Spent 500000 on sons tuition fee")
+predict("Spent 5 rs on train")
+predict("spent 500 on uber")
 
 
-import spacy
-nlp = spacy.load("en_core_web_sm")
-
-doc = nlp("I spent Rs. 700 and 300 on food on 26th July")
-for ent in doc.ents:
-    print(ent.text, ent.label_)
+# In[856]:
 
 
-# In[17]:
+# import spacy
+# nlp = spacy.load("en_core_web_sm")
+
+# doc = nlp("I spent Rs. 700 and 300 on food on 26th July")
+# for ent in doc.ents:
+#     print(ent.text, ent.label_)
+
+
+# In[857]:
 
 
 import os
@@ -246,7 +289,7 @@ print(os.getcwd())
 
 
 
-# In[18]:
+# In[858]:
 
 
 print("Training order:", list(encoder.classes_))
