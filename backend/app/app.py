@@ -1,5 +1,5 @@
 import logging
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import torch
@@ -13,6 +13,7 @@ from PIL import Image
 import pytesseract
 import re
 import io
+from datetime import datetime
 from ..db_functions import *
 from torch.nn import functional as F
 # receipt parsing model
@@ -149,10 +150,98 @@ async def parse_receipt(file: UploadFile = File(...)):
         sequence = re.sub(r"<.*?>", "", sequence, count=1).strip()
 
         parsed_json = donut_processor.token2json(sequence)
-        return JSONResponse(content={"parsed": parsed_json})
+
+        cleaned_items = clean_parsed_receipt(parsed_json)  # [{'name':..., 'quantity':..., 'price':...}, ...]
+
+        # Predict category per item
+        for item in cleaned_items:
+            text = f"{item['quantity']} x {item['name']} @ {item['price']}"
+            category, _ = predict_category_and_amount(text)
+            item['category'] = category
+
+        display_text, total = format_receipt_for_display(cleaned_items)
+
+        return JSONResponse(content={
+            "items": cleaned_items,
+            "total": total
+        })
     except Exception as e:
         logger.error("Error in /parse_receipt: %s", str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+def clean_parsed_receipt(parsed):
+    cleaned = []
+    for item in parsed:
+        try:
+            name = item.get("nm")
+            if isinstance(name, dict):
+                # Some garbage nested dict → skip
+                continue
+            if not name:
+                continue
+
+            quantity = item.get("cnt", 1)
+
+            # Handle price (string like "85,00" → float 85.00)
+            raw_price = str(item.get("price", "0")).replace(",", ".")
+            try:
+                price = float(raw_price)
+            except ValueError:
+                continue
+
+            cleaned.append({
+                "name": name.strip(),
+                "quantity": int(quantity),
+                "price": price
+            })
+        except Exception:
+            continue
+    format_receipt_for_display(cleaned)
+    logger.info("Cleaned receipt data: %s", cleaned)
+    return cleaned
+def format_receipt_for_display(cleaned_items):
+    lines = []
+    total = 0.0
+    for item in cleaned_items:
+        line = f"{item['quantity']} x {item['name']} @ {item['price']:.2f}"
+        lines.append(line)
+        total += item['quantity'] * item['price']
+    display_text = "\n".join(lines)
+    logger.info("Formatted receipt data: %s", display_text)
+    return display_text, total
+
+@app.post("/receipt/confirm")
+async def confirm_receipt(data: dict = Body(...)):
+    items = data.get("items", [])
+    if not items:
+        raise HTTPException(status_code=400, detail="No items provided")
+
+    date = datetime.datetime.today().strftime("%Y-%m-%d")
+    saved_entries = []
+
+    for it in items:
+        name = it.get("name", "Unknown")
+        quantity = int(it.get("quantity", 1))
+        price = float(it.get("price", 0.0))
+        category = it.get("category", "Others")
+
+        total_price = quantity * price
+        text = f"{quantity} x {name} @ {price:.2f}"
+
+        add_entry(date, text, category, total_price)
+
+        saved_entries.append({
+            "name": name,
+            "quantity": quantity,
+            "price": price,
+            "category": category,
+            "total": total_price,
+        })
+
+    return {
+        "message": "Receipt saved",
+        "date": date,
+        "entries": saved_entries,
+    }
 
 def extract_amount(text: str) -> float:
     amounts = [float(m.replace(',', '')) for m in re.findall(r'\d+(?:,\d{3})*(?:\.\d+)?', text)]
@@ -178,7 +267,7 @@ def predict_category_and_amount(text: str, threshold: float = 0.6):
 # -------------------
 # FastAPI route
 # -------------------
-@app.post("/predict_category")
+@app.post("/predict")
 async def predict_expense(req: ExpenseRequest):
     if not req.text:
         raise HTTPException(status_code=400, detail="No text provided")

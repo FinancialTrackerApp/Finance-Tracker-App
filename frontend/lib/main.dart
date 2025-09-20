@@ -213,33 +213,15 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
-  void parseReceipt(List<int> fileBytes) {
-    // Placeholder: later we can use tesseract_ocr or backend service
-    print("Parsing receipt of ${fileBytes.length} bytes...");
-
-    // Example dummy data returned
-    Map<String, dynamic> parsedData = {
-      "date": "2025-09-19",
-      "items": [
-        {"name": "Milk", "amount": 50.0},
-        {"name": "Bread", "amount": 30.0},
-      ],
-      "total": 80.0,
-    };
-
-    print(parsedData);
-  }
-
-  Future<void> uploadFile() async {
+  Future<void> uploadFile(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'png','jpeg'],
+      allowedExtensions: ['pdf', 'jpg', 'png', 'jpeg'],
     );
 
     if (result != null) {
       File file = File(result.files.single.path!);
 
-      // Send to backend
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('http://127.0.0.1:8000/parse_receipt'),
@@ -252,12 +234,27 @@ class MyAppState extends ChangeNotifier {
         String respStr = await response.stream.bytesToString();
         var jsonData = json.decode(respStr);
         print("Parsed receipt data: $jsonData");
+
+        List<ReceiptItem> items = parseItems(jsonData['items']);
+        double total = jsonData['total']?.toDouble() ?? 0.0;
+
+        // Use the context passed from the UI
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ReceiptPreviewScreen(items: items, total: total),
+          ),
+        );
       } else {
         print("Failed to parse receipt. Status: ${response.statusCode}");
       }
     } else {
       print("No file selected");
     }
+  }
+
+  List<ReceiptItem> parseItems(List<dynamic> jsonItems) {
+    return jsonItems.map((e) => ReceiptItem.fromJson(e)).toList();
   }
 }
 // Main page with NavigationRail
@@ -533,7 +530,7 @@ class _GeneratorPageState extends State<GeneratorPage> {
         children: <Widget>[
           FloatingActionButton(
             onPressed: () {
-              appState.uploadFile();
+              appState.uploadFile(context);
               print("File upload pressed");
             },
             heroTag: null, // Add unique heroTag or set to null if not animating between screens
@@ -1044,6 +1041,186 @@ class SettingsPage extends StatelessWidget {
           'Settings Page',
           style: GoogleFonts.lato(fontSize: 24),
         ),
+      ),
+    );
+  }
+}
+const categories = [
+  "Education",
+  "Food",
+  "Healthcare",
+  "Housing",
+  "Others",
+  "Transport"
+];
+
+class ReceiptItem {
+  String name;
+  int quantity;
+  double price;
+  String category;
+
+  ReceiptItem({
+    required this.name,
+    required this.quantity,
+    required this.price,
+    this.category = "Others",
+  });
+
+  factory ReceiptItem.fromJson(Map<String, dynamic> json) {
+    return ReceiptItem(
+      name: json['name'],
+      quantity: json['quantity'],
+      price: (json['price'] as num).toDouble(),
+      category: json['category'] ?? "Others",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "quantity": quantity,
+      "price": price,
+      "category": category,
+    };
+  }
+}
+class ReceiptPreviewScreen extends StatefulWidget {
+  final List<ReceiptItem> items;
+  final double total;
+
+  const ReceiptPreviewScreen({
+    super.key,
+    required this.items,
+    required this.total,
+  });
+
+  @override
+  State<ReceiptPreviewScreen> createState() => _ReceiptPreviewScreenState();
+}
+
+class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
+  late List<ReceiptItem> editableItems;
+
+  @override
+  void initState() {
+    super.initState();
+    editableItems = List.from(widget.items); // copy
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Receipt Preview")),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: editableItems.length,
+              itemBuilder: (context, index) {
+                final item = editableItems[index];
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          initialValue: item.name,
+                          onChanged: (val) => item.name = val,
+                          decoration: const InputDecoration(labelText: "Item"),
+                        ),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: TextFormField(
+                                initialValue: item.quantity.toString(),
+                                keyboardType: TextInputType.number,
+                                onChanged: (val) =>
+                                item.quantity = int.tryParse(val) ?? item.quantity,
+                                decoration: const InputDecoration(labelText: "Qty"),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Flexible(
+                              child: TextFormField(
+                                initialValue: item.price.toString(),
+                                keyboardType: TextInputType.number,
+                                onChanged: (val) =>
+                                item.price = double.tryParse(val) ?? item.price,
+                                decoration: const InputDecoration(labelText: "Price"),
+                              ),
+                            ),
+                          ],
+                        ),
+                        DropdownButtonFormField<String>(
+                          value: item.category,
+                          items: categories
+                              .map((cat) => DropdownMenuItem(
+                            value: cat,
+                            child: Text(cat),
+                          ))
+                              .toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                item.category = val;
+                              });
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Category",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Text(
+            "Total: ${widget.total.toStringAsFixed(2)}",
+            style: const TextStyle(fontSize: 18),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final payload = {
+                "items": editableItems.map((e) => e.toJson()).toList(),
+              };
+
+              final url = Uri.parse("http://127.0.0.1:8000/receipt/confirm"); // replace with your FastAPI URL
+
+              try {
+                final response = await http.post(
+                  url,
+                  headers: {"Content-Type": "application/json"},
+                  body: jsonEncode(payload),
+                );
+
+                if (response.statusCode == 200) {
+                  final resData = jsonDecode(response.body);
+                  // Optionally show a success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            "Saved! Total: ${resData['entries'].fold(0, (sum, e) => sum + e['total'])}")),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Failed: ${response.statusCode}")),
+                  );
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Error: $e")),
+                );
+              }
+            },
+            child: const Text("Confirm & Save"),
+          ),
+        ],
       ),
     );
   }
