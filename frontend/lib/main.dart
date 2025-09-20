@@ -284,6 +284,10 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GraphPage();
         appBarTitle = "Expenditure Graph"; // Title for Graph page
         break;
+      case 2: // New case for Settings
+        page = SettingsPage();
+        appBarTitle = "Settings"; // Title for Settings page
+        break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -323,6 +327,16 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 setState(() {
                   selectedIndex = 1;
+                });
+                Navigator.of(context).pop(); // close drawer
+              },
+            ),
+            ListTile( // New ListTile for Settings
+              leading: Icon(Icons.settings),
+              title: Text("Settings", style: GoogleFonts.lato()),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 2;
                 });
                 Navigator.of(context).pop(); // close drawer
               },
@@ -1017,3 +1031,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 }
 
+// Settings Page
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: Center(
+        child: Text(
+          'Settings Page',
+          style: GoogleFonts.lato(fontSize: 24),
+        ),
+      ),
+    );
+  }
+}
