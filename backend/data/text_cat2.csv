@@ -1,427 +1,427 @@
 text,category
-Bought apples,Food
-Purchased train ticket,Transport
-Paid rent for apartment,Housing
-Paid for medicines,Healthcare
-Paid tuition fee,Education
+apples,Food
+train ticket,Transport
+rent apartment,Housing
+medicines,Healthcare
+tuition fee,Education
 Bananas 6 pcs,Food
-Paid bus fare,Transport
-Paid house rent,Housing
-Purchased antibiotics,Healthcare
-Bought school textbooks,Education
-Milk bought,Food
+bus fare,Transport
+house rent,Housing
+antibiotics,Healthcare
+school textbooks,Education
+Milk,Food
 Metro travel,Transport
-Paid flat rent,Housing
-Bought cough syrup,Healthcare
-Paid semester fee,Education
+flat rent,Housing
+cough syrup,Healthcare
+semester fee,Education
 Eggs dozen,Food
 Taxi ride booked,Transport
 Transferred monthly rent,Housing
-Bought vitamin tablets,Healthcare
-Paid college fee,Education
-Purchased tomatoes,Food
+vitamin tablets,Healthcare
+college fee,Education
+tomatoes,Food
 Auto-rickshaw fare,Transport
-Paid rent of home,Housing
-Bought inhaler,Healthcare
-Paid for online course,Education
-Potatoes bought,Food
+rent home,Housing
+inhaler,Healthcare
+online course,Education
+Potatoes,Food
 Petrol refill,Transport
-Paid rent of flat,Housing
-Bought ointment,Healthcare
-Bought reference books,Education
-Bought onions,Food
-Diesel purchased,Transport
-Paid apartment rent,Housing
-Bought protein supplements,Healthcare
-Paid coaching institute fee,Education
-Carrots purchased,Food
+rent flat,Housing
+ointment,Healthcare
+reference books,Education
+onions,Food
+Diesel,Transport
+apartment rent,Housing
+protein supplements,Healthcare
+coaching institute fee,Education
+Carrots,Food
 Travel card recharge,Transport
 Cleared electricity bill,Housing
-Bought glucose strips,Healthcare
-Paid exam fee,Education
+glucose strips,Healthcare
+exam fee,Education
 Spinach picked up,Food
-Paid toll,Transport
-Paid electricity charges,Housing
-Bought allergy tablets,Healthcare
-Registered for certification exam,Education
-Cauliflower bought,Food
+toll,Transport
+electricity charges,Housing
+allergy tablets,Healthcare
+Registered certification exam,Education
+Cauliflower,Food
 Bus pass renewal,Transport
-Paid for power bill,Housing
-Bought skin cream,Healthcare
-Paid MBA course fee,Education
+power bill,Housing
+skin cream,Healthcare
+MBA course fee,Education
 Rice shopping,Food
-Parking fee paid,Transport
-Paid monthly electricity,Housing
-Bought nasal spray,Healthcare
-Paid IIT entrance exam fee,Education
-Wheat flour bought,Food
-Cab pool paid,Transport
-Paid light charges,Housing
-Purchased multivitamins,Healthcare
-Paid music class fee,Education
-Cooking oil purchased,Food
-Bike rent paid,Transport
-Paid electric bill,Housing
-Bought herbal medicine,Healthcare
-Paid for doubt clearing session,Education
+Parking fee,Transport
+monthly electricity,Housing
+nasal spray,Healthcare
+IIT entrance exam fee,Education
+Wheat flour,Food
+Cab pool,Transport
+light charges,Housing
+multivitamins,Healthcare
+music class fee,Education
+Cooking oil,Food
+Bike rent,Transport
+electric bill,Housing
+herbal medicine,Healthcare
+doubt clearing session,Education
 Salt picked up,Food
-Overnight bus coach paid,Transport
+Overnight bus coach,Transport
 Electricity payment done,Housing
-Bought thermometer,Healthcare
-Bought lab kit,Education
-Bought sugar,Food
+thermometer,Healthcare
+lab kit,Education
+sugar,Food
 Flight booked,Transport
-Gas bill paid,Housing
-Bought first aid kit,Healthcare
-Paid for lab coat,Education
-Dal purchased,Food
+Gas bill,Housing
+first aid kit,Healthcare
+lab coat,Education
+Dal,Food
 Vehicle service done,Transport
-Paid cooking gas charges,Housing
-Bought BP monitor,Healthcare
-Bought calculator for exams,Education
-Bought chana,Food
-Car wash paid,Transport
+cooking gas charges,Housing
+BP monitor,Healthcare
+calculator exams,Education
+chana,Food
+Car wash,Transport
 Gas recharge done,Housing
-Bought contact lenses solution,Healthcare
-Paid for skill development course,Education
-Green peas bought,Food
-Van service paid,Transport
+contact lenses solution,Healthcare
+skill development course,Education
+Green peas,Food
+Van service,Transport
 Cooking gas refill,Housing
-Bought eye drops,Healthcare
-Paid for library annual fee,Education
-Cucumber bought,Food
-Shuttle ride paid,Transport
+eye drops,Healthcare
+library annual fee,Education
+Cucumber,Food
+Shuttle ride,Transport
 Gas connection recharge,Housing
-Bought regular health insurance,Healthcare
-Paid for digital learning course,Education
-Lemon purchased,Food
+regular health insurance,Healthcare
+digital learning course,Education
+Lemon,Food
 Ferry ride taken,Transport
 Gas cylinder refill,Housing
-Paid doctor consultation,Healthcare
-Paid for science kit,Education
-Mangoes bought,Food
+doctor consultation,Healthcare
+science kit,Education
+Mangoes,Food
 Luggage transported,Transport
 Filled gas cylinder,Housing
-Paid for health checkup,Healthcare
-Paid for art supplies,Education
-Oranges purchased,Food
-Scooter fare paid,Transport
-Paid for gas supply,Housing
-Paid for blood tests,Healthcare
-Paid for sports academy fee,Education
-Grapes bought,Food
+health checkup,Healthcare
+art supplies,Education
+Oranges,Food
+Scooter fare,Transport
+gas supply,Housing
+blood tests,Healthcare
+sports academy fee,Education
+Grapes,Food
 Cycle hire,Transport
-Paid propane charges,Housing
-Paid dental cleaning,Healthcare
-Paid registration for hackathon,Education
+propane charges,Housing
+dental cleaning,Healthcare
+registration hackathon,Education
 Watermelon picked,Food
 Rickshaw ride taken,Transport
-Paid water bill,Housing
-Paid dental filling,Healthcare
-Paid for project supplies,Education
-Pineapple bought,Food
-Uber ride paid,Transport
-Paid monthly water charge,Housing
-Paid hospital bill,Healthcare
-Paid school admission fee,Education
+water bill,Housing
+dental filling,Healthcare
+project supplies,Education
+Pineapple,Food
+Uber ride,Transport
+monthly water charge,Housing
+hospital bill,Healthcare
+school admission fee,Education
 Bread loaf,Food
 Ola ride booked,Transport
-Paid municipal water,Housing
+municipal water,Housing
 Hospital bill payment,Healthcare
-Paid for e-book subscription,Education
-Butter purchased,Food
-Airport shuttle paid,Transport
-Paid water tax,Housing
+e-book subscription,Education
+Butter,Food
+Airport shuttle,Transport
+water tax,Housing
 Hospital admission advance,Healthcare
-Bought graph notebooks,Education
-Cheese bought,Food
+graph notebooks,Education
+Cheese,Food
 Train sleeper booked,Transport
 Cleared water charges,Housing
-Paid for surgery consultation,Healthcare
-Paid for mock test series,Education
+surgery consultation,Healthcare
+mock test series,Education
 Paneer picked up,Food
-Bus coach paid,Transport
-Paid water supply charge,Housing
-Paid for physiotherapy,Healthcare
-Subscribed to Coursera course,Education
+Bus coach,Transport
+water supply charge,Housing
+physiotherapy,Healthcare
+Subscribed Coursera course,Education
 Curd shopping,Food
-E-rickshaw paid,Transport
-Water tank refill paid,Housing
+E-rickshaw,Transport
+Water tank refill,Housing
 Ultrasound scan taken,Healthcare
-Paid research journal subscription,Education
-Bought ice cream,Food
+research journal subscription,Education
+ice cream,Food
 Express train taken,Transport
-Paid water supply tax,Housing
+water supply tax,Housing
 MRI scan done,Healthcare
-Paid school computer lab fee,Education
-Biscuits purchased,Food
+school computer lab fee,Education
+Biscuits,Food
 Long distance bus riding,Transport
-Paid water utility bill,Housing
-Paid for diabetes test,Healthcare
-Paid school bus fee,Education
-Chips bought,Food
-Taxi fare night paid,Transport
-Paid for drinking water,Housing
-Paid for ECG test,Healthcare
-Bought stationery pack,Education
-Soft drink purchased,Food
-Monthly pass paid,Transport
-Paid internet charges,Housing
-Paid for ENT consultation,Healthcare
-Paid for whiteboard markers,Education
+water utility bill,Housing
+diabetes test,Healthcare
+school bus fee,Education
+Chips,Food
+Taxi fare night,Transport
+drinking water,Housing
+ECG test,Healthcare
+stationery pack,Education
+Soft drink,Food
+Monthly pass,Transport
+internet charges,Housing
+ENT consultation,Healthcare
+whiteboard markers,Education
 Juice shopping,Food
 Metro recharge done,Transport
-Paid internet bill,Housing
-Ambulance charges paid,Healthcare
-Paid for cultural training,Education
-Tea purchased,Food
+internet bill,Housing
+Ambulance charges,Healthcare
+cultural training,Education
+Tea,Food
 Bike petrol filled,Transport
-Paid WiFi service,Housing
-Paid cancer screening,Healthcare
-Paid diploma fee,Education
-Coffee bought,Food
-Auto ride paid,Transport
-Paid broadband service,Housing
-Paid for dental medicines,Healthcare
-Paid career counseling workshop fee,Education
+WiFi service,Housing
+cancer screening,Healthcare
+diploma fee,Education
+Coffee,Food
+Auto ride,Transport
+broadband service,Housing
+dental medicines,Healthcare
+career counseling workshop fee,Education
 Dry fruits shopping,Food
-Taxi ride paid,Transport
-Internet charges paid,Housing
-Paid for pathology test,Healthcare
-Bought geometry box for class,Education
-Almonds bought,Food
+Taxi ride,Transport
+Internet charges,Housing
+pathology test,Healthcare
+geometry box class,Education
+Almonds,Food
 Uber XL booked,Transport
 Internet recharge,Housing
-Paid for x-ray,Healthcare
-Registered for online coding test,Education
-Cashews purchased,Food
-Van share paid,Transport
-Paid network charges,Housing
-Paid dermatology treatment,Healthcare
-Bought pen drives,Education
-Raisins bought,Food
-Autorickshaw fare paid,Transport
-Paid cable bill,Housing
-Paid for dietitian,Healthcare
-Paid for music training,Education
+x-ray,Healthcare
+Registered online coding test,Education
+Cashews,Food
+Van share,Transport
+network charges,Housing
+dermatology treatment,Healthcare
+pen drives,Education
+Raisins,Food
+Autorickshaw fare,Transport
+cable bill,Housing
+dietitian,Healthcare
+music training,Education
 Honey picked up,Food
 Shared cab ride,Transport
-Paid TV subscription,Housing
-Paid for vaccination,Healthcare
-Paid for language class,Education
-Jam purchased,Food
+TV subscription,Housing
+vaccination,Healthcare
+language class,Education
+Jam,Food
 Cab night fare,Transport
-Paid for home security,Housing
-Paid for dialysis,Healthcare
-Bought science lab manual,Education
+home security,Housing
+dialysis,Healthcare
+science lab manual,Education
 Ketchup shopping,Food
-Parking monthly paid,Transport
-Paid society maintenance,Housing
-Paid for eye checkup,Healthcare
-Bought school uniform,Education
-Pickle bought,Food
-Metro ticket purchased,Transport
-Paid for cleaning service,Housing
-Paid for skin allergy treatment,Healthcare
-Paid college hostel fee,Education
-Instant noodles purchased,Food
+Parking monthly,Transport
+society maintenance,Housing
+eye checkup,Healthcare
+school uniform,Education
+Pickle,Food
+Metro ticket,Transport
+cleaning service,Housing
+skin allergy treatment,Healthcare
+college hostel fee,Education
+Instant noodles,Food
 Car fuel refill,Transport
-Housekeeping paid,Housing
-Paid for pediatric consultation,Healthcare
-Paid for annual magazine,Education
-Pasta bought,Food
-Bike repair paid,Transport
-Paid garbage collection,Housing
-Paid for emergency ward,Healthcare
-Bought printer ink,Education
-Breakfast cereal purchased,Food
+Housekeeping,Housing
+pediatric consultation,Healthcare
+annual magazine,Education
+Pasta,Food
+Bike repair,Transport
+garbage collection,Housing
+emergency ward,Healthcare
+printer ink,Education
+Breakfast cereal,Food
 Cycle rent done,Transport
-Paid pest control service,Housing
-Paid for therapy session,Healthcare
-Paid sports coaching fee,Education
+pest control service,Housing
+therapy session,Healthcare
+sports coaching fee,Education
 Chocolate shopping,Food
-Bus ticket purchased,Transport
-Paid repairs for home,Housing
-Paid for hospital stay,Healthcare
-Bought project report,Education
-Popcorn bought,Food
+Bus ticket,Transport
+repairs home,Housing
+hospital stay,Healthcare
+project report,Education
+Popcorn,Food
 Train general ticket,Transport
-Paid for plumbing,Housing
-Paid mental health counseling,Healthcare
-Bought art kit,Education
-Bought dragon fruit,Food
+plumbing,Housing
+mental health counseling,Healthcare
+art kit,Education
+dragon fruit,Food
 Flight seat reserved,Transport
-Paid for painting,Housing
-Paid for general health checkup,Healthcare
-Bought backpack for college,Education
-Guava purchased,Food
-Ambulance ride paid,Transport
-Paid for home upgrade,Housing
-Purchased insulin,Healthcare
-Registered for GRE exam,Education
-Peaches bought,Food
-Luggage shuttle paid,Transport
-Paid housing dues,Housing
-Paid for blood pressure test,Healthcare
-Bought tuition materials,Education
+painting,Housing
+general health checkup,Healthcare
+backpack college,Education
+Guava,Food
+Ambulance ride,Transport
+home upgrade,Housing
+insulin,Healthcare
+Registered GRE exam,Education
+Peaches,Food
+Luggage shuttle,Transport
+housing dues,Housing
+blood pressure test,Healthcare
+tuition materials,Education
 Avocado shopping,Food
-Freight charge paid,Transport
-Paid property tax,Housing
-Paid for vision test,Healthcare
-Bought project notebook,Education
-Lettuce bought,Food
-Driver tip paid,Transport
-Paid mortgage installment,Housing
-Paid for acupuncture,Healthcare
-Bought study guide,Education
-Broccoli purchased,Food
+Freight charge,Transport
+property tax,Housing
+vision test,Healthcare
+project notebook,Education
+Lettuce,Food
+Driver tip,Transport
+mortgage installment,Housing
+acupuncture,Healthcare
+study guide,Education
+Broccoli,Food
 Cab payment done,Transport
-Paid loan EMI,Housing
-Paid for homeopathy,Healthcare
-Paid for visual learning subscription,Education
+loan EMI,Housing
+homeopathy,Healthcare
+visual learning subscription,Education
 Sweet corn shopping,Food
-Auto recharge paid,Transport
-Paid security fee,Housing
-Paid for ayurveda,Healthcare
-Bought sketchbook,Education
-Radish bought,Food
+Auto recharge,Transport
+security fee,Housing
+ayurveda,Healthcare
+sketchbook,Education
+Radish,Food
 Uber pool booked,Transport
-Paid for new furniture,Housing
-Paid for alternative medicine,Healthcare
-Paid for new pen,Education
-Pumpkin purchased,Food
-Truck ride paid,Transport
-Paid maintenance charges,Housing
-Paid for eye surgery,Healthcare
-Bought learning app subscription,Education
-Cabbage bought,Food
+new furniture,Housing
+alternative medicine,Healthcare
+new pen,Education
+Pumpkin,Food
+Truck ride,Transport
+maintenance charges,Housing
+eye surgery,Healthcare
+learning app subscription,Education
+Cabbage,Food
 Train express ticket,Transport
-Paid washer repair,Housing
-Paid physiotherapy session,Healthcare
-Paid for application form fee,Education
+washer repair,Housing
+physiotherapy session,Healthcare
+application form fee,Education
 Brinjal shopping,Food
 Bus ticket renewed,Transport
-Paid electricity recharge,Housing
-Paid for surgery,Healthcare
-Paid for workshop,Education
-Beans bought,Food
-Cab fare paid,Transport
-Paid water tank refill,Housing
-Paid for IVF treatment,Healthcare
-Paid for school reunion entry,Education
-Green chillies purchased,Food
+electricity recharge,Housing
+surgery,Healthcare
+workshop,Education
+Beans,Food
+Cab fare,Transport
+water tank refill,Housing
+IVF treatment,Healthcare
+school reunion entry,Education
+Green chillies,Food
 Metro ride taken,Transport
-Paid for courier,Housing
-Paid for dental braces,Healthcare
-Paid for engineering kit,Education
+courier,Housing
+dental braces,Healthcare
+engineering kit,Education
 Beetroot shopping,Food
-Paid toll charges,Transport
-Paid parking slot,Housing
-Paid for oral surgery,Healthcare
-Bought physics book,Education
-Papaya bought,Food
-Rail ticket purchased,Transport
-Paid for parking garage,Housing
-Paid for dental extraction,Healthcare
-Bought math workbook,Education
-Kiwi purchased,Food
+toll charges,Transport
+parking slot,Housing
+oral surgery,Healthcare
+physics book,Education
+Papaya,Food
+Rail ticket,Transport
+parking garage,Housing
+dental extraction,Healthcare
+math workbook,Education
+Kiwi,Food
 Ride-sharing fee,Transport
-Paid gate charges,Housing
-Paid radiology charges,Healthcare
-Bought chemistry set,Education
+gate charges,Housing
+radiology charges,Healthcare
+chemistry set,Education
 Sapota picked up,Food
-Bike parking paid,Transport
-Paid for house insurance,Housing
-Paid cardiology fee,Healthcare
-Paid for attendance tracking device,Education
-Plums bought,Food
+Bike parking,Transport
+house insurance,Housing
+cardiology fee,Healthcare
+attendance tracking device,Education
+Plums,Food
 Scooter parking fee,Transport
-Paid for insurance premium,Housing
-Paid orthopedics consultation,Healthcare
-Paid entrance test fee,Education
-Lychee purchased,Food
-Ferry pass purchased,Transport
-Paid for home decor,Housing
-Paid for health scan,Healthcare
-Paid for college festival,Education
-Apricot bought,Food
-Monthly travel card bought,Transport
-Paid for pest inspection,Housing
-Paid for dental x-ray,Healthcare
-Paid for LMS access,Education
+insurance premium,Housing
+orthopedics consultation,Healthcare
+entrance test fee,Education
+Lychee,Food
+Ferry pass,Transport
+home decor,Housing
+health scan,Healthcare
+college festival,Education
+Apricot,Food
+Monthly travel card,Transport
+pest inspection,Housing
+dental x-ray,Healthcare
+LMS access,Education
 Dates shopping,Food
 Reserved seat train,Transport
-Paid society charges,Housing
-Paid for medicine delivery,Healthcare
-Paid for hostel study materials,Education
-Walnuts bought,Food
-Paid sleeper coach bus,Transport
-Paid for housing society,Housing
-Paid for wheelchair service,Healthcare
-Paid for academic calendar,Education
+society charges,Housing
+medicine delivery,Healthcare
+hostel study materials,Education
+Walnuts,Food
+sleeper coach bus,Transport
+housing society,Housing
+wheelchair service,Healthcare
+academic calendar,Education
 Pomegranate picked,Food
-Paid shared auto,Transport
-Paid for home gate,Housing
-Paid for health insurance renewal,Healthcare
-Paid for batch photo,Education
-Coconut bought,Food
-Paid cab pool fare,Transport
-Paid for storage,Housing
-Paid cancer therapy,Healthcare
-Paid computer classroom fee,Education
-Raspberry purchased,Food
-Paid shuttle fare,Transport
-Paid monthly security fee,Housing
-Paid for critical care,Healthcare
-Bought exam pad,Education
-Blueberry bought,Food
-Paid airport pickup,Transport
-Paid for bill deposit,Housing
-Paid for medical procedure,Healthcare
-Paid for online mock test,Education
+shared auto,Transport
+home gate,Housing
+health insurance renewal,Healthcare
+batch photo,Education
+Coconut,Food
+cab pool fare,Transport
+storage,Housing
+cancer therapy,Healthcare
+computer classroom fee,Education
+Raspberry,Food
+shuttle fare,Transport
+monthly security fee,Housing
+critical care,Healthcare
+exam pad,Education
+Blueberry,Food
+airport pickup,Transport
+bill deposit,Housing
+medical procedure,Healthcare
+online mock test,Education
 Strawberry shopping,Food
-Paid rapid transit,Transport
-Paid colony charges,Housing
-Paid for medicine bill,Healthcare
-Paid for aptitude training,Education
-Peas bought,Food
-Rail pass paid,Transport
-Paid for home water pump,Housing
-Paid for doctor prescription,Healthcare
-Paid career guidance,Education
-Turnip purchased,Food
+rapid transit,Transport
+colony charges,Housing
+medicine bill,Healthcare
+aptitude training,Education
+Peas,Food
+Rail pass,Transport
+home water pump,Housing
+doctor prescription,Healthcare
+career guidance,Education
+Turnip,Food
 Monthly bike pass,Transport
-Paid water purifier maintenance,Housing
-Paid for home care,Healthcare
-Bought dictionary,Education
-Zucchini bought,Food
-Paid e-rickshaw fare,Transport
-Paid lock repair,Housing
-Bought calcium supplements,Healthcare
-Paid extracurricular class fee,Education
+water purifier maintenance,Housing
+home care,Healthcare
+dictionary,Education
+Zucchini,Food
+e-rickshaw fare,Transport
+lock repair,Housing
+calcium supplements,Healthcare
+extracurricular class fee,Education
 Bell pepper shopping,Food
-Paid van service,Transport
-Paid home garden service,Housing
-Bought glucose test,Healthcare
-Bought smartboard marker,Education
-Capsicum purchased,Food
-Paid taxi pool,Transport
-Paid home heater service,Housing
-Paid for polio vaccine,Healthcare
-Paid for convocation fee,Education
-Spinach bought,Food
-Paid cab sharing,Transport
-Paid for chimney cleaning,Housing
-Paid insurance premium,Healthcare
-Bought competitive exam guide,Education
-Coriander purchased,Food
-Paid sleeper bus ticket,Transport
-Paid for building maintenance,Housing
-Paid for dental checkup,Healthcare
-Bought tracing paper,Education
-Spent on medical treatment,Healthcare
-Paid medical bill,Healthcare
-Bought medical supplies,Healthcare
+van service,Transport
+home garden service,Housing
+glucose test,Healthcare
+smartboard marker,Education
+Capsicum,Food
+taxi pool,Transport
+home heater service,Housing
+polio vaccine,Healthcare
+convocation fee,Education
+Spinach,Food
+cab sharing,Transport
+chimney cleaning,Housing
+insurance premium,Healthcare
+competitive exam guide,Education
+Coriander,Food
+sleeper bus ticket,Transport
+building maintenance,Housing
+dental checkup,Healthcare
+tracing paper,Education
+medical treatment,Healthcare
+medical bill,Healthcare
+medical supplies,Healthcare
 Medical expense payment,Healthcare
 Medical consultation fee,Healthcare
 transport,Transport
@@ -430,117 +430,117 @@ healthcare,Healthcare
 Healthcare,Healthcare
 KFC,Food
 kfc,Food
-burger from KFC,Food
-vegetables from market,Food
-bought apples,Food
-snacks at bakery,Food
-bought apples,Food
+burger KFC,Food
+vegetables market,Food
+apples,Food
+snacks bakery,Food
+apples,Food
 bananas 6 pcs,Food
-coffee at cafe,Food
-vegetables from market,Food
+coffee cafe,Food
+vegetables market,Food
 grocery shopping,Food
 ice cream cup,Food
 ice cream cup,Food
 bananas 6 pcs,Food
-vegetables from market,Food
-burger from KFC,Food
+vegetables market,Food
+burger KFC,Food
 ordered pizza,Food
-snacks at bakery,Food
+snacks bakery,Food
 ordered pizza,Food
-burger from KFC,Food
-vegetables from market,Food
-coffee at cafe,Food
-lunch at canteen,Food
-coffee at cafe,Food
+burger KFC,Food
+vegetables market,Food
+coffee cafe,Food
+lunch canteen,Food
+coffee cafe,Food
 ice cream cup,Food
-snacks at bakery,Food
-burger from KFC,Food
+snacks bakery,Food
+burger KFC,Food
 ice cream cup,Food
-bought apples,Food
-vegetables from market,Food
-bought apples,Food
-vegetables from market,Food
+apples,Food
+vegetables market,Food
+apples,Food
+vegetables market,Food
 ice cream cup,Food
-coffee at cafe,Food
-coffee at cafe,Food
-bought apples,Food
+coffee cafe,Food
+coffee cafe,Food
+apples,Food
 ice cream cup,Food
 grocery shopping,Food
 bananas 6 pcs,Food
-burger from KFC,Food
+burger KFC,Food
 ordered pizza,Food
-vegetables from market,Food
-vegetables from market,Food
+vegetables market,Food
+vegetables market,Food
 ice cream cup,Food
-lunch at canteen,Food
-vegetables from market,Food
-lunch at canteen,Food
-snacks at bakery,Food
-burger from KFC,Food
+lunch canteen,Food
+vegetables market,Food
+lunch canteen,Food
+snacks bakery,Food
+burger KFC,Food
 ice cream cup,Food
-lunch at canteen,Food
+lunch canteen,Food
 bananas 6 pcs,Food
 ordered pizza,Food
-lunch at canteen,Food
-lunch at canteen,Food
-burger from KFC,Food
+lunch canteen,Food
+lunch canteen,Food
+burger KFC,Food
 bananas 6 pcs,Food
 ordered pizza,Food
-vegetables from market,Food
-vegetables from market,Food
+vegetables market,Food
+vegetables market,Food
 ice cream cup,Food
-vegetables from market,Food
-snacks at bakery,Food
-coffee at cafe,Food
-snacks at bakery,Food
+vegetables market,Food
+snacks bakery,Food
+coffee cafe,Food
+snacks bakery,Food
 ordered pizza,Food
-bought apples,Food
+apples,Food
 ice cream cup,Food
 ordered pizza,Food
 bananas 6 pcs,Food
-bought apples,Food
-snacks at bakery,Food
+apples,Food
+snacks bakery,Food
 ice cream cup,Food
 grocery shopping,Food
 ordered pizza,Food
-bought apples,Food
-vegetables from market,Food
+apples,Food
+vegetables market,Food
 grocery shopping,Food
-snacks at bakery,Food
-bought apples,Food
+snacks bakery,Food
+apples,Food
 grocery shopping,Food
-snacks at bakery,Food
+snacks bakery,Food
 ice cream cup,Food
-bought apples,Food
+apples,Food
 ice cream cup,Food
-coffee at cafe,Food
+coffee cafe,Food
 bananas 6 pcs,Food
 ordered pizza,Food
-snacks at bakery,Food
-snacks at bakery,Food
+snacks bakery,Food
+snacks bakery,Food
 ice cream cup,Food
-bought apples,Food
-burger from KFC,Food
-bought apples,Food
+apples,Food
+burger KFC,Food
+apples,Food
 ordered pizza,Food
 grocery shopping,Food
-burger from KFC,Food
-coffee at cafe,Food
-burger from KFC,Food
-burger from KFC,Food
+burger KFC,Food
+coffee cafe,Food
+burger KFC,Food
+burger KFC,Food
 bananas 6 pcs,Food
-burger from KFC,Food
+burger KFC,Food
 uber ride,Transport
 train ticket,Transport
 metro pass,Transport
 uber ride,Transport
 uber ride,Transport
 petrol refill,Transport
-cab to office,Transport
-cab to office,Transport
-cab to office,Transport
+cab office,Transport
+cab office,Transport
+cab office,Transport
 train ticket,Transport
-cab to office,Transport
+cab office,Transport
 petrol refill,Transport
 uber ride,Transport
 uber ride,Transport
@@ -574,10 +574,10 @@ petrol refill,Transport
 metro pass,Transport
 taxi fare,Transport
 petrol refill,Transport
-cab to office,Transport
+cab office,Transport
 bus ticket,Transport
 flight booking,Transport
-cab to office,Transport
+cab office,Transport
 uber ride,Transport
 petrol refill,Transport
 bus ticket,Transport
@@ -609,7 +609,7 @@ metro pass,Transport
 metro pass,Transport
 bus ticket,Transport
 auto fare,Transport
-cab to office,Transport
+cab office,Transport
 metro pass,Transport
 bike parking fee,Transport
 auto fare,Transport
@@ -624,9 +624,9 @@ flight booking,Transport
 uber ride,Transport
 flight booking,Transport
 uber ride,Transport
-cab to office,Transport
+cab office,Transport
 taxi fare,Transport
-cab to office,Transport
+cab office,Transport
 train ticket,Transport
 bus ticket,Transport
 metro pass,Transport
@@ -643,7 +643,7 @@ home loan emi,Housing
 furniture repair,Housing
 home loan emi,Housing
 apartment deposit,Housing
-paid rent,Housing
+rent,Housing
 gas connection bill,Housing
 home loan emi,Housing
 electricity bill,Housing
@@ -659,7 +659,7 @@ furniture repair,Housing
 furniture repair,Housing
 gas connection bill,Housing
 furniture repair,Housing
-paid rent,Housing
+rent,Housing
 home loan emi,Housing
 maintenance charge,Housing
 home loan emi,Housing
@@ -669,14 +669,14 @@ home loan emi,Housing
 home loan emi,Housing
 water bill,Housing
 wifi recharge,Housing
-paid rent,Housing
-paid rent,Housing
+rent,Housing
+rent,Housing
 furniture repair,Housing
 wifi recharge,Housing
 house cleaning,Housing
-paid rent,Housing
-paid rent,Housing
-paid rent,Housing
+rent,Housing
+rent,Housing
+rent,Housing
 wifi recharge,Housing
 gas connection bill,Housing
 furniture repair,Housing
@@ -689,7 +689,7 @@ wifi recharge,Housing
 gas connection bill,Housing
 wifi recharge,Housing
 apartment deposit,Housing
-paid rent,Housing
+rent,Housing
 maintenance charge,Housing
 apartment deposit,Housing
 house cleaning,Housing
@@ -726,14 +726,14 @@ water bill,Housing
 gas connection bill,Housing
 maintenance charge,Housing
 gas connection bill,Housing
-paid rent,Housing
-paid rent,Housing
+rent,Housing
+rent,Housing
 apartment deposit,Housing
 apartment deposit,Housing
 apartment deposit,Housing
 home loan emi,Housing
 house cleaning,Housing
-paid rent,Housing
+rent,Housing
 doctor consultation,Healthcare
 dental checkup,Healthcare
 blood test,Healthcare
@@ -746,7 +746,7 @@ vitamin tablets,Healthcare
 hospital bill,Healthcare
 doctor consultation,Healthcare
 vitamin tablets,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 hospital bill,Healthcare
 blood test,Healthcare
 doctor consultation,Healthcare
@@ -774,12 +774,12 @@ therapy session,Healthcare
 hospital bill,Healthcare
 first aid kit,Healthcare
 dental checkup,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 first aid kit,Healthcare
 vitamin tablets,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 hospital bill,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 dental checkup,Healthcare
 health insurance premium,Healthcare
 eye test,Healthcare
@@ -791,9 +791,9 @@ blood test,Healthcare
 eye test,Healthcare
 therapy session,Healthcare
 health insurance premium,Healthcare
-bought medicines,Healthcare
-bought medicines,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
+medicines,Healthcare
+medicines,Healthcare
 doctor consultation,Healthcare
 vitamin tablets,Healthcare
 blood test,Healthcare
@@ -803,7 +803,7 @@ blood test,Healthcare
 dental checkup,Healthcare
 eye test,Healthcare
 vitamin tablets,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 vitamin tablets,Healthcare
 dental checkup,Healthcare
 therapy session,Healthcare
@@ -818,7 +818,7 @@ doctor consultation,Healthcare
 blood test,Healthcare
 first aid kit,Healthcare
 eye test,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 dental checkup,Healthcare
 hospital bill,Healthcare
 therapy session,Healthcare
@@ -830,25 +830,25 @@ health insurance premium,Healthcare
 blood test,Healthcare
 blood test,Healthcare
 blood test,Healthcare
-bought medicines,Healthcare
+medicines,Healthcare
 vitamin tablets,Healthcare
 vitamin tablets,Healthcare
 first aid kit,Healthcare
 exam registration,Education
 school uniform,Education
 stationery shopping,Education
-bought textbooks,Education
-bought textbooks,Education
+textbooks,Education
+textbooks,Education
 library fine,Education
 stationery shopping,Education
-bought textbooks,Education
-bought textbooks,Education
+textbooks,Education
+textbooks,Education
 stationery shopping,Education
 online course fee,Education
-bought textbooks,Education
+textbooks,Education
 online course fee,Education
 school uniform,Education
-bought textbooks,Education
+textbooks,Education
 school uniform,Education
 notebooks purchase,Education
 lab equipment,Education
@@ -861,7 +861,7 @@ college admission fee,Education
 lab equipment,Education
 school uniform,Education
 stationery shopping,Education
-bought textbooks,Education
+textbooks,Education
 online course fee,Education
 notebooks purchase,Education
 lab equipment,Education
@@ -873,24 +873,24 @@ school uniform,Education
 school uniform,Education
 exam registration,Education
 school uniform,Education
-paid tuition fee,Education
+tuition fee,Education
 school uniform,Education
-bought textbooks,Education
+textbooks,Education
 lab equipment,Education
 online course fee,Education
 notebooks purchase,Education
 college admission fee,Education
 exam registration,Education
 library fine,Education
-paid tuition fee,Education
+tuition fee,Education
 exam registration,Education
-paid tuition fee,Education
+tuition fee,Education
 library fine,Education
 lab equipment,Education
 notebooks purchase,Education
 college admission fee,Education
 exam registration,Education
-bought textbooks,Education
+textbooks,Education
 exam registration,Education
 exam registration,Education
 school uniform,Education
@@ -898,23 +898,23 @@ exam registration,Education
 library fine,Education
 library fine,Education
 online course fee,Education
-bought textbooks,Education
+textbooks,Education
 college admission fee,Education
 lab equipment,Education
 lab equipment,Education
 lab equipment,Education
-paid tuition fee,Education
+tuition fee,Education
 stationery shopping,Education
 library fine,Education
 lab equipment,Education
-paid tuition fee,Education
-bought textbooks,Education
+tuition fee,Education
+textbooks,Education
 school uniform,Education
 school uniform,Education
 lab equipment,Education
-bought textbooks,Education
-bought textbooks,Education
-paid tuition fee,Education
+textbooks,Education
+textbooks,Education
+tuition fee,Education
 notebooks purchase,Education
 lab equipment,Education
 lab equipment,Education
@@ -923,8 +923,8 @@ college admission fee,Education
 online course fee,Education
 school uniform,Education
 exam registration,Education
-bought textbooks,Education
-paid tuition fee,Education
+textbooks,Education
+tuition fee,Education
 exam registration,Education
 online course fee,Education
 online course fee,Education
@@ -933,7 +933,7 @@ lab equipment,Education
 school uniform,Education
 stationery shopping,Education
 library fine,Education
-bought textbooks,Education
+textbooks,Education
 spotify premium,Entertainment
 bowling session,Entertainment
 bowling session,Entertainment
