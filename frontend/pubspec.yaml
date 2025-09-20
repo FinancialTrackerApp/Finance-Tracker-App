@@ -17,6 +17,7 @@ dependencies:
   http: ^1.1.0
   fl_chart: ^1.1.0
   table_calendar: ^3.0.9
+  file_picker: ^6.1.5
 
 dev_dependencies:
   flutter_test:
