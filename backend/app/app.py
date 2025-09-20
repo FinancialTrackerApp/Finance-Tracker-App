@@ -154,6 +154,11 @@ async def parse_receipt(file: UploadFile = File(...)):
         logger.error("Error in /parse_receipt: %s", str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+def extract_amount(text: str) -> float:
+    amounts = [float(m.replace(',', '')) for m in re.findall(r'\d+(?:,\d{3})*(?:\.\d+)?', text)]
+    return max(amounts) if amounts else 0.0
+    
+
 def predict_category_and_amount(text: str, threshold: float = 0.6):
     text_without_numbers = normalize_text(text)
     vec = vectorizer.transform([text_without_numbers]).toarray()
@@ -173,7 +178,7 @@ def predict_category_and_amount(text: str, threshold: float = 0.6):
 # -------------------
 # FastAPI route
 # -------------------
-@app.post("/predict")
+@app.post("/predict_category")
 async def predict_expense(req: ExpenseRequest):
     if not req.text:
         raise HTTPException(status_code=400, detail="No text provided")
@@ -230,8 +235,8 @@ def get_all_expenses(date: str = None):
  
     return [{"id": row[0], "text": row[1]} for row in rows]
 
-@app.get("predict/expense")
-def predicted_expense(date: str): #YYYY-MM format
+@app.get("/predict_expense")
+async def predicted_expense(date: str): #YYYY-MM format
     if not date:
         raise HTTPException(status_code=400, detail="No date provided")
     last_3_month_expenses = get_last_3_months_expenses(date)
