@@ -235,8 +235,34 @@ def predicted_expense(date: str): #YYYY-MM format
     if not date:
         raise HTTPException(status_code=400, detail="No date provided")
     last_3_month_expenses = get_last_3_months_expenses(date)
-    if(sum(sum(row) for row in L)==0):
+    if(sum(sum(row) for row in last_3_month_expenses)==0):
         raise HTTPException(status_code=404, detail="No expense data for the last 3 months")
+    class ExpensePredictor(torch.nn.Module):
+        def __init__(self, input_size, hidden_size, output_size):
+            super(ExpensePredictor, self).__init__()
+            self.lstm = torch.nn.LSTM(input_size, hidden_size, batch_first=True)
+            self.fc = torch.nn.Linear(hidden_size, output_size)
+        def forward(self, x):
+            out, _ = self.lstm(x)
+            out = out[:, -1, :]
+            out = self.fc(out)
+            return out
+
+    # Model parameters (should match those used during training)
+    input_size = 6
+    hidden_size = 16
+    output_size = 6
+    model_path = "../models/expense_predictor_model.pth"
+    # Instantiate the model and load weights
+    model = ExpensePredictor(input_size, hidden_size, output_size)
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
+
+    last_3_months_tensor = torch.tensor(last_3_month_expenses).unsqueeze(0)  # shape (1, 3, 6)
+
+    with torch.no_grad():
+        prediction = model(last_3_months_tensor)
+        print("Predicted next month (normalized):", prediction.numpy())
 
 @app.get("/stats/day/{date}")
 def get_stats_for_day(date: str):
