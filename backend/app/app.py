@@ -184,7 +184,8 @@ async def predict_expense(req: ExpenseRequest):
         raise HTTPException(status_code=400, detail="No text provided")
     if not req.date:
         raise HTTPException(status_code=400, detail="No date provided")
-
+    
+    logger.info(f"Received text: {req.text} for date: {req.date}")
     category, amount = predict_category_and_amount(req.text)
 
     try:
@@ -209,7 +210,7 @@ def delete_expense(entry_id: int):
     expense_date = row[0]
     # Delete the expense
     delete_entry_by_id(entry_id)
-
+    logger.info(f"Deleted expense with ID {entry_id} for date {expense_date}")
     # Get the updated total for that date
     updated_total = get_total_by_date(expense_date)
 
@@ -228,9 +229,9 @@ def get_all_expenses(date: str = None):
     else:
         cursor.execute("SELECT id, text, category, amount FROM expenses")
     rows = cursor.fetchall()
-    print("Querying for date:", date)
-    print("Rows fetched from DB:", rows)
-    
+    logger.info("Querying for date: %s", date)
+    logger.info("Rows fetched from DB: %s", rows)
+
     conn.close()
  
     return [{"id": row[0], "text": row[1]} for row in rows]
@@ -239,9 +240,13 @@ def get_all_expenses(date: str = None):
 async def predicted_expense(date: str): #YYYY-MM format
     if not date:
         raise HTTPException(status_code=400, detail="No date provided")
+    
     last_3_month_expenses = get_last_3_months_expenses(date)
+    logger.info("Fetched last 3 months expenses")
     if(sum(sum(row) for row in last_3_month_expenses)==0):
+        logger.warning("No expense data for the last 3 months")
         raise HTTPException(status_code=404, detail="No expense data for the last 3 months")
+    
     class ExpensePredictor(torch.nn.Module):
         def __init__(self, input_size, hidden_size, output_size):
             super(ExpensePredictor, self).__init__()
@@ -267,7 +272,7 @@ async def predicted_expense(date: str): #YYYY-MM format
 
     with torch.no_grad():
         prediction = model(last_3_months_tensor)
-        print("Predicted next month (normalized):", prediction.numpy())
+        logger.info("Predicted next month (normalized): %s", prediction.numpy())
 
 @app.get("/stats/day/{date}")
 def get_stats_for_day(date: str):
