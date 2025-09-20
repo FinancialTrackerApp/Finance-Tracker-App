@@ -60,20 +60,35 @@ Entry appears in daily summary & category breakdown.
 🏗 Project Structure
 backend/
 │
+
 ├── app.py                  # FastAPI app (routes: /predict, /expenses, /stats, /receipt)
+
 ├── add_to_db.py            # SQLite helpers
+
 ├── database.py             # Neon DB scaffold (not yet active)
+
 ├── cat_ip.py               # ML training script (TF-IDF + PyTorch classifier)
+
 ├── data/
+
 │   ├── expenses.db         # SQLite database
+
 │   └── text_category.csv   # Training dataset
+
 ├── models/
+
 │   ├── vectorizer.pkl
+
 │   ├── category_predictor_model.pth
+
 │   ├── encoder.pth
+
 │   └── donut_model/        # Pretrained Donut weights
+
 │
+
 frontend/
+
 └── main.dart               # Flutter app (UI, charts, calendar, receipt upload)
 
 ⚙️ Backend Setup
@@ -113,6 +128,3 @@ Category breakdown for a date.
 
  Deploy backend + connect Flutter app.
 
- Fix frontend popup → open only on click instead of hover.
-
-Do you want me to write the sample request/response for the /receipt endpoint with Donut output as well, so you can paste it into your README?
