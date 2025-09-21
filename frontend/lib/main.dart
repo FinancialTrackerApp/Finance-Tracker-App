@@ -235,8 +235,19 @@ class MyAppState extends ChangeNotifier {
         var jsonData = json.decode(respStr);
         print("Parsed receipt data: $jsonData");
 
-        List<ReceiptItem> items = parseItems(jsonData['items']);
-        double total = jsonData['total']?.toDouble() ?? 0.0;
+        // FIX: Check if jsonData['items'] is null, and provide an empty list if it is.
+        // Also, ensure jsonData itself isn't null and is a Map.
+        List<ReceiptItem> items = []; // Default to empty list
+        if (jsonData != null && jsonData is Map && jsonData['items'] != null) {
+          items = parseItems(jsonData['items'] as List<dynamic>);
+        } else {
+          // Optionally, handle the case where 'items' is missing or jsonData is not as expected.
+          print("Warning: 'items' key not found in response or jsonData is not a Map.");
+        }
+        
+        double total = jsonData != null && jsonData is Map && jsonData['total'] != null 
+                       ? (jsonData['total'] as num).toDouble() 
+                       : 0.0;
 
         // Use the context passed from the UI
         Navigator.push(
@@ -1101,11 +1112,21 @@ class ReceiptPreviewScreen extends StatefulWidget {
 
 class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
   late List<ReceiptItem> editableItems;
+  double total = 0.0;
 
   @override
   void initState() {
     super.initState();
     editableItems = List.from(widget.items); // copy
+    _recalculateTotal();
+  }
+
+  void _recalculateTotal() {
+    total = editableItems.fold(
+      0.0,
+          (sum, item) => sum + (item.quantity * item.price),
+    );
+    setState(() {}); // update UI
   }
 
   @override
@@ -1120,15 +1141,33 @@ class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
               itemBuilder: (context, index) {
                 final item = editableItems[index];
                 return Card(
+                  key: ObjectKey(item), // Added key here
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Item details",
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  editableItems.removeAt(index);
+                                  _recalculateTotal();
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                         TextFormField(
                           initialValue: item.name,
                           onChanged: (val) => item.name = val,
-                          decoration: const InputDecoration(labelText: "Item"),
+                          decoration:
+                          const InputDecoration(labelText: "Item"),
                         ),
                         Row(
                           children: [
@@ -1136,9 +1175,13 @@ class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
                               child: TextFormField(
                                 initialValue: item.quantity.toString(),
                                 keyboardType: TextInputType.number,
-                                onChanged: (val) =>
-                                item.quantity = int.tryParse(val) ?? item.quantity,
-                                decoration: const InputDecoration(labelText: "Qty"),
+                                onChanged: (val) {
+                                  item.quantity =
+                                      int.tryParse(val) ?? item.quantity;
+                                  _recalculateTotal();
+                                },
+                                decoration:
+                                const InputDecoration(labelText: "Qty"),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -1146,9 +1189,13 @@ class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
                               child: TextFormField(
                                 initialValue: item.price.toString(),
                                 keyboardType: TextInputType.number,
-                                onChanged: (val) =>
-                                item.price = double.tryParse(val) ?? item.price,
-                                decoration: const InputDecoration(labelText: "Price"),
+                                onChanged: (val) {
+                                  item.price =
+                                      double.tryParse(val) ?? item.price;
+                                  _recalculateTotal();
+                                },
+                                decoration:
+                                const InputDecoration(labelText: "Price"),
                               ),
                             ),
                           ],
@@ -1181,7 +1228,7 @@ class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
             ),
           ),
           Text(
-            "Total: ${widget.total.toStringAsFixed(2)}",
+            "Total: ${total.toStringAsFixed(2)}",
             style: const TextStyle(fontSize: 18),
           ),
           ElevatedButton(
@@ -1190,7 +1237,7 @@ class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
                 "items": editableItems.map((e) => e.toJson()).toList(),
               };
 
-              final url = Uri.parse("http://127.0.0.1:8000/receipt/confirm"); // replace with your FastAPI URL
+              final url = Uri.parse("http://127.0.0.1:8000/receipt/confirm");
 
               try {
                 final response = await http.post(
@@ -1201,15 +1248,18 @@ class _ReceiptPreviewScreenState extends State<ReceiptPreviewScreen> {
 
                 if (response.statusCode == 200) {
                   final resData = jsonDecode(response.body);
-                  // Optionally show a success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                        content: Text(
-                            "Saved! Total: ${resData['entries'].fold(0, (sum, e) => sum + e['total'])}")),
+                      content: Text(
+                        "Saved! Total: ${resData['entries'].fold(0, (sum, e) => sum + e['total'])}",
+                      ),
+                    ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Failed: ${response.statusCode}")),
+                    SnackBar(
+                        content:
+                        Text("Failed: ${response.statusCode}")),
                   );
                 }
               } catch (e) {
