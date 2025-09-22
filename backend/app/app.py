@@ -363,6 +363,24 @@ async def predicted_expense(date: str): #YYYY-MM format
         prediction = model(last_3_months_tensor)
         logger.info("Predicted next month (normalized): %s", prediction.numpy())
 
+@app.get("/create_update_budget")
+def create_budget(budget: dict):
+    try:
+        create_or_update_budget(
+            budget_id = budget.get("budget_id", 1),
+            Food_budget=budget.get("Food_budget", 0),
+            Education_budget=budget.get("Education_budget", 0),
+            Healthcare_budget=budget.get("Healthcare_budget", 0),
+            Housing_budget=budget.get("Housing_budget", 0),
+            Transport_budget=budget.get("Transport_budget", 0),
+            Others_budget=budget.get("Others_budget", 0),
+            budget_expiry=budget.get("budget_expiry", None)
+        )
+        logger.info("Budget created/updated successfully")
+        return {"message": "Budget created/updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/stats/day/{date}")
 def get_stats_for_day(date: str):
     try:

@@ -28,7 +28,7 @@ os.makedirs(DATA_DIR, exist_ok=True)  # make sure 'data' folder exists
 
 DB_NAME = os.path.join(DATA_DIR, "expenses.db")  # backend/data/expenses.db
 
-def init_db():
+def init_expense_table():
     """Initialize the expenses table (raw entries table)."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -43,7 +43,35 @@ def init_db():
             text TEXT
         )
     """)
+    conn.commit()
+    conn.close()
 
+def init_budget_table():
+    """Initialize the budget table."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    # Budget table: one row per budget
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS budgets (
+            budget_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Food_budget INTEGER,
+            Education_budget INTEGER,
+            Healthcare_budget INTEGER,
+            Housing_budget INTEGER,
+            Transport_budget INTEGER,
+            Entertainment_budget INTEGER,
+            Others_budget INTEGER,
+            Food_spent INTEGER,
+            Education_spent INTEGER,
+            Healthcare_spent INTEGER,
+            Housing_spent INTEGER,
+            Transport_spent INTEGER,
+            Entertainment_spent INTEGER,
+            Others_spent INTEGER,     
+            budget_expiry TEXT
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -199,17 +227,65 @@ def get_last_3_months_expenses(input_month):
         return filled
     else:
         return month_data
+import sqlite3
+
+DB_NAME = "your_db_name.db"
+
+def create_or_update_budget(
+    budget_id=1,
+    Food_budget=0,
+    Education_budget=0,
+    Healthcare_budget=0,
+    Housing_budget=0,
+    Transport_budget=0,
+    Others_budget=0,
+    budget_expiry=None
+):
+    """
+    Create or update a budget entry in the budgets table.
+    """
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    # Check if budget with this budget_id exists
+    cursor.execute("SELECT budget_id FROM budgets WHERE budget_id = ?", (budget_id,))
+    existing = cursor.fetchone()
+
+    if existing:
+        # Update existing budget
+        cursor.execute("""
+            UPDATE budgets
+            SET Food_budget = ?, Education_budget = ?, Healthcare_budget = ?, 
+                Housing_budget = ?, Transport_budget = ?, Others_budget = ?, 
+                budget_expiry = ?
+            WHERE budget_id = ?
+        """, (Food_budget, Education_budget, Healthcare_budget, Housing_budget, 
+              Transport_budget, Others_budget, budget_expiry, budget_id))
+        print(f"Updated budget with id {budget_id}.")
+    else:
+        # Insert new budget
+        cursor.execute("""
+            INSERT INTO budgets 
+            (budget_id, Food_budget, Education_budget, Healthcare_budget, 
+             Housing_budget, Transport_budget, Others_budget, budget_expiry)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (budget_id, Food_budget, Education_budget, Healthcare_budget, Housing_budget, 
+              Transport_budget, Others_budget, budget_expiry))
+        print(f"Created new budget with id {budget_id}.")
+
+    conn.commit()
+    conn.close()
 # -------------------
 # Example usage
 # -------------------
 if __name__ == "__main__":
-    init_db()
+    # init_db()
 
-    add_entry("2025-09-04", "spent 500 at kfc", "Food", 500)
-    add_entry("2025-09-04", "paid 2000 tuition fee", "Education", 2000)
+    # add_entry("2025-09-04", "spent 500 at kfc", "Food", 500)
+    # add_entry("2025-09-04", "paid 2000 tuition fee", "Education", 2000)
 
-    print("Total on 2025-09-04:", get_total_by_date("2025-09-04"))
-    print("Category dict:", get_category_dict("2025-09-04"))
-    print("Raw entries:", get_entries("2025-09-04"))
+    # print("Total on 2025-09-04:", get_total_by_date("2025-09-04"))
+    # print("Category dict:", get_category_dict("2025-09-04"))
+    # print("Raw entries:", get_entries("2025-09-04"))
+    init_budget_table()
 
-    clear_db()
