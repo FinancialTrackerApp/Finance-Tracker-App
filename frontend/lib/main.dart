@@ -286,15 +286,19 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (selectedIndex) {
       case 0:
         page = GeneratorPage();
-        appBarTitle = "Expense Tracker"; // Title for Home page
+        appBarTitle = "Expense Tracker"; 
         break;
       case 1:
         page = GraphPage();
-        appBarTitle = "Expenditure Graph"; // Title for Graph page
+        appBarTitle = "Expenditure Graph"; 
         break;
-      case 2: // New case for Settings
+      case 2: 
         page = SettingsPage();
-        appBarTitle = "Settings"; // Title for Settings page
+        appBarTitle = "Settings"; 
+        break;
+      case 3: // New case for Budget
+        page = BudgetPage();
+        appBarTitle = "Budget"; // Title for Budget page
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -345,6 +349,16 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 setState(() {
                   selectedIndex = 2;
+                });
+                Navigator.of(context).pop(); // close drawer
+              },
+            ),
+            ListTile( 
+              leading: Icon(Icons.account_balance_wallet), // Or any other appropriate icon
+              title: Text("Budget", style: GoogleFonts.lato()),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 3;
                 });
                 Navigator.of(context).pop(); // close drawer
               },
@@ -1050,6 +1064,24 @@ class SettingsPage extends StatelessWidget {
       body: Center(
         child: Text(
           'Settings Page',
+          style: GoogleFonts.lato(fontSize: 24),
+        ),
+      ),
+    );
+  }
+}
+
+// Budget Page
+class BudgetPage extends StatelessWidget {
+  const BudgetPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: Center(
+        child: Text(
+          'Budget Page',
           style: GoogleFonts.lato(fontSize: 24),
         ),
       ),
