@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 #DB path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "..", "data")
-DB_NAME = os.path.join(DATA_DIR, "expenses.db")
+DB_NAME = os.path.join(DATA_DIR, "financedata.db")
 
 # -------------------
 # Define model
@@ -268,7 +268,7 @@ def predict_category_and_amount(text: str, threshold: float = 0.6):
 # FastAPI route
 # -------------------
 @app.post("/predict")
-async def predict_expense(req: ExpenseRequest):
+async def predict_category(req: ExpenseRequest):
     if not req.text:
         raise HTTPException(status_code=400, detail="No text provided")
     if not req.date:
@@ -279,7 +279,9 @@ async def predict_expense(req: ExpenseRequest):
 
     try:
         add_entry(req.date, req.text, category, amount)
+        logger.info(f"Saved entry: {req.text}, {category}, {amount} on {req.date}")
     except Exception as e:
+        logger.error(f"Error saving to DB: {e}")
         raise HTTPException(status_code=500, detail=f"DB save failed: {str(e)}")
 
     total_amount = get_total_by_date(req.date)

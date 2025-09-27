@@ -11,7 +11,7 @@ import datetime
 # | 3  | 2025-09-05 | Transport | 200.0  | spent 200 on bus           |
 
 # Functions available:
-# init_db()               # Initialize the database and table
+# init_db()               # Initialize the database and tables
 # add_entry(date, text, category, amount)  # Add an expense entry
 # get_total_by_date(date) # Get total expenses for a given date
 # get_category_dict(date) # Get sum per category for a given date
@@ -26,8 +26,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # backend/
 DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)  # make sure 'data' folder exists
 
-DB_NAME = os.path.join(DATA_DIR, "expenses.db")  # backend/data/expenses.db
-
+DB_NAME = os.path.join(DATA_DIR, "financedata.db")  # backend/data/financedata.db
+print("DB path:", DB_NAME)
 def init_expense_table():
     """Initialize the expenses table (raw entries table)."""
     conn = sqlite3.connect(DB_NAME)
@@ -43,6 +43,7 @@ def init_expense_table():
             text TEXT
         )
     """)
+    print("Initialized expenses table at ", DB_NAME)
     conn.commit()
     conn.close()
 
@@ -76,6 +77,7 @@ def init_budget_table():
     conn.close()
 
 def add_entry(date, text, category, amount):
+
     """
     Add an expense entry into the expenses table.
     """
@@ -87,7 +89,6 @@ def add_entry(date, text, category, amount):
         INSERT INTO expenses (date, category, amount, text)
         VALUES (?, ?, ?, ?)
     """, (date, category, amount, text))
-    print(f"Added entry: {date}, {category}, {amount}, {text}")
     conn.commit()
     conn.close()
     
@@ -229,7 +230,6 @@ def get_last_3_months_expenses(input_month):
         return month_data
 import sqlite3
 
-DB_NAME = "your_db_name.db"
 
 def create_or_update_budget(
     budget_id=1,
@@ -287,5 +287,5 @@ if __name__ == "__main__":
     # print("Total on 2025-09-04:", get_total_by_date("2025-09-04"))
     # print("Category dict:", get_category_dict("2025-09-04"))
     # print("Raw entries:", get_entries("2025-09-04"))
-    init_budget_table()
+    init_expense_table()
 
